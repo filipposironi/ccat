@@ -15,13 +15,54 @@ signature:
 		event gearDown (Width);
 		event gearReverse;
 		state actualGear (Gear);
-		
+		TI gearShiftOne;
+		TI gearShiftTwo;
+		TI gearShiftReverse;
+	
+	/*
+	 * Aggiungere le formule necessarie per garantire il corretto funzionamento
+	 * del cambio. Quindi, per un evento gearUp (1) ottengo 1 -> 2, 2 -> 3,
+	 * ecc...
+	 * Inoltre, è necessario impedire la chiamata a gearUp (x) e gearDown (x)
+	 * quando la marcia selezionata è Park o Reverse.
+	 * Manca del tutto la modellizzazione della marcia Park, immagino sia
+	 * necessario aggiungere anche in questo caso una tempistica come abbiamo
+	 * fatto per le altre marcie (non dovrebbe costare poi molto ed è una cosa
+	 * aggiuntiva che dobbiamo ricordarci di citare in un'eventuale
+	 * documentazione).
+	 */
 	axioms:
 	vars:
 		selectedGear: Gear;
 		notSelectedGears: Gear;
+		gearShift: Width;
 	formulae:
-		GearsMutualExclusion: all selectedGear (actualGear(selectedGear) ->
-			all notSelectedGears (notSelectedGears <> selectedGear -> not actualGear(notSelectedGears)));
-
+		GearsMutualExclusion:
+			all selectedGear (actualGear (selectedGear) ->
+				all notSelectedGears (notSelectedGears <> selectedGear ->
+					not actualGear (notSelectedGears)));
+		GearsShift:
+			((selectedGear = First & actualGear (selectedGear)) ->
+				SomF (all gearShift (not gearDown (gearShift)))) &
+			((selectedGear = Second & actualGear (selectedGear)) ->
+				SomF (not gearDown (2) | not gearUp (2))) & 
+			((selectedGear = Third & actualGear (selectedGear)) ->
+				SomF (all gearShift (not gearUp (gearShift))));
+		ConcurrentGearsShift:
+			Alw (
+				(gearUp (gearShift) -> not (gearDown (gearShift) | gearReverse)) &
+				(gearDown (gearShift) -> not (gearUp (gearShift) | gearReverse)) &
+				(gearReverse -> not (gearUp (gearShift) | gearDown (gearShift)))
+			);
+		TimeConstraints:
+			((selectedGear = First | selectedGear = Second) & actualGear (selectedGear) & gearUp (1) ->
+				Futr (Becomes (actualGear (selectedGear + 1)), gearShiftOne)) &
+			(selectedGear = First & actualGear (selectedGear) & gearUp (2) ->
+				Futr (Becomes (selectedGear = Third & actualGear (selectedGear)), gearShiftTwo)) &
+			((selectedGear = Second | selectedGear = Third) & actualGear (selectedGear) & gearDown (1) ->
+				Futr (Becomes (actualGear (selectedGear - 1)), gearShiftOne)) &
+			(selectedGear = Third & actualGear (selectedGear) & gearDown (2) ->
+				Futr (Becomes (selectedGear = First & actualGear (selectedGear)), gearShiftTwo)) &
+			(all selectedGear (selectedGear <> Reverse & actualGear (selectedGear) & gearReverse ->
+				Futr (Becomes (selectedGear = Reverse & actualGear (selectedGear)), gearShiftReverse)));
 end
