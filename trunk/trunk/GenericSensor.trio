@@ -1,0 +1,13 @@
+class GenericSensor
+
+signature: 
+
+	visible: actualValue;
+
+	temporal domain: real;
+
+	items: 
+		TD actualValue;
+		TD storedValue;
+
+end

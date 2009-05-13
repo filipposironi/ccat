@@ -1,0 +1,15 @@
+class SpeedSensor 
+
+inherit: 
+	GenericSensor;
+
+signature: 
+
+	visible: sendSpeed;
+
+	temporal domain: real;
+
+	items: 
+		TD sendSpeed (integer);
+
+end

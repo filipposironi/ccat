@@ -1,0 +1,20 @@
+class TransmissionControlUnit 
+
+signature: 
+
+	visible: controlCommandPush, controlCommandRelease, controlGearUp, controlGearDown, controlGearReverse, sendSpeed;
+
+	temporal domain: real;
+	
+	domains:
+		Width: 1..2;
+
+	items: 
+		event controlCommandPush;
+		event controlCommandRelease;
+		event controlGearUp (Width);
+		event controlGearDown (Width);
+		event controlGearReverse;
+		TD sendSpeed (integer);
+
+end
