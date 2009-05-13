@@ -14,6 +14,14 @@ signature:
 		event gearUp (Width);
 		event gearDown (Width);
 		event gearReverse;
-		TD actualGear (Gear);
+		state actualGear (Gear);
+		
+	axioms:
+	vars:
+		selectedGear: Gear;
+		notSelectedGears: Gear;
+	formulae:
+		GearsMutualExclusion: all selectedGear (actualGear(selectedGear) ->
+			all notSelectedGears (notSelectedGears <> selectedGear -> not actualGear(notSelectedGears)));
 
 end
