@@ -1,15 +1,14 @@
 class SpeedSensor 
 
-inherit: 
-	GenericSensor;
-
 signature: 
 
-	visible: sendSpeed;
+	visible: storedSpeed, actualSpeed, sendSpeed;
 
 	temporal domain: real;
 
 	items: 
+		TD storedSpeed;
+		TD actualSpeed;
 		TD sendSpeed (integer);
 
 end
