@@ -1,0 +1,40 @@
+class ComputerControlledAutomaticTransmission 
+
+import: HydraulicSystem, PlanetaryGearSet, TransmissionControlUnit, TorqueConverter, SpeedSensor;
+
+signature: 
+
+	visible: engineStatus, actualSpeed;
+
+	temporal domain: real;
+	
+	domains:
+		EngineStatus: {Attached, Detached};
+
+	items: 
+		TD engineStatus (EngineStatus);
+		TD actualSpeed;
+
+	modules: 
+		hydraulicSystem: HydraulicSystem;
+		planetaryGearSet: PlanetaryGearSet;
+		transmissionControlUnit: TransmissionControlUnit;
+		torqueConverter: TorqueConverter;
+		speedSensor: SpeedSensor;
+
+	connections: 
+		(direct engineStatus, torqueConverter.engineStatus)
+		(direct torqueConverter.commandPush, hydraulicSystem.commandPush)
+		(direct torqueConverter.commandRelease, hydraulicSystem.commandRelease)
+		(direct planetaryGearSet.gearUp, hydraulicSystem.gearUp)
+		(direct planetaryGearSet.gearDown, hydraulicSystem.gearDown)
+		(direct planetaryGearSet.gearReverse, hydraulicSystem.gearReverse)
+		(direct hydraulicSystem.controlCommandPush, transmissionControlUnit.controlCommandPush)
+		(direct hydraulicSystem.controlCommandRelease, transmissionControlUnit.controlCommandRelease)
+		(direct hydraulicSystem.controlGearUp, transmissionControlUnit.controlGearUp)
+		(direct hydraulicSystem.controlGearDown, transmissionControlUnit.controlGearDown)
+		(direct hydraulicSystem.controlGearReverse, transmissionControlUnit.controlGearReverse)
+		(direct transmissionControlUnit.sendSpeed, speedSensor.sendSpeed)
+		(direct actualSpeed, speedSensor.actualValue)
+
+end

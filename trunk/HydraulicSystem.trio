@@ -1,0 +1,26 @@
+class HydraulicSystem 
+
+signature: 
+
+	visible: gearHandle, commandPush, commandRelease, gearUp, gearDown, gearReverse, controlCommandPush, controlCommandRelease, controlGearUp, controlGearDown, controlGearReverse;
+
+	temporal domain: real;
+	
+	domains:
+		GearPosition: {Drive, Park, Reverse};
+		Width: 1..2; 
+
+	items: 
+		event gearHandle (GearPosition);
+		event commandPush;
+		event commandRelease;
+		event gearUp (Width);
+		event gearDown (Width);
+		event gearReverse;
+		event controlCommandPush;
+		event controlCommandRelease;
+		event controlGearUp (Width);
+		event controlGearDown (Width);
+		event controlGearReverse;
+
+end

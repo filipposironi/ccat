@@ -1,0 +1,19 @@
+class PlanetaryGearSet 
+
+signature: 
+
+	visible: gearUp, gearDown, gearReverse, actualGear;
+
+	temporal domain: real;
+	
+	domains:
+		Gear: {First, Second, Third, Park, Reverse};
+		Width: 1..2; 
+
+	items: 
+		event gearUp (Width);
+		event gearDown (Width);
+		event gearReverse;
+		TD actualGear (Gear);
+
+end
