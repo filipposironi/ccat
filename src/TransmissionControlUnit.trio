@@ -2,7 +2,7 @@ class TransmissionControlUnit
 
 signature: 
 
-	visible: controlCommandPush, controlCommandRelease, controlGearUp, controlGearDown, controlGearReverse, sendSpeed;
+	visible: controlCommandDetach, controlCommandAttach, controlGearUp, controlGearDown, controlGearReverse, sendSpeed;
 
 	temporal domain: real;
 	
@@ -10,8 +10,8 @@ signature:
 		Width: 1..2;
 
 	items: 
-		event controlCommandPush;
-		event controlCommandRelease;
+		event controlCommandDetach;
+		event controlCommandAttach;
 		event controlGearUp (Width);
 		event controlGearDown (Width);
 		event controlGearReverse;

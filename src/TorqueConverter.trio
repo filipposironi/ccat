@@ -2,16 +2,16 @@ class TorqueConverter
 
 signature: 
 
-	visible: engineStatus;
+	visible: commandAttach, commandDetach, engineState;
 
 	temporal domain: real;
 	
 	domains:
-		EngineStatus: {Attached, Detached};
+		EngineState: {Attached, Detached};
 
 	items: 
-		event commandPush;
-		event commandRelease;
-		TD engineStatus (EngineStatus);
+		event commandDetach;
+		event commandAttach;
+		TD engineState (EngineState);
 
 end
