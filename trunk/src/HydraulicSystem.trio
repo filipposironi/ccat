@@ -2,25 +2,24 @@ class HydraulicSystem
 
 signature: 
 
-	visible: gearHandle, commandDetach, commandAttach, gearUp, gearDown, gearReverse, controlCommandDetach, controlCommandAttach, controlGearUp, controlGearDown, controlGearReverse;
+	visible: gearHandle, commandDetach, commandAttach, gearShift, gearReverse, controlCommandDetach, controlCommandAttach, controlGearShift, controlGearReverse;
 
 	temporal domain: real;
 	
 	domains:
 		GearPosition: {Drive, Park, Reverse};
-		Width: 1..2; 
+		ShiftWidth: 1..2;
+		ShiftDirection: {Up, Down};
 
 	items: 
 		event gearHandle (GearPosition);
 		event commandDetach;
 		event commandAttach;
-		event gearUp (Width);
-		event gearDown (Width);
+		event gearShift (ShiftWidth, ShiftDirection);
 		event gearReverse;
 		event controlCommandDetach;
 		event controlCommandAttach;
-		event controlGearUp (Width);
-		event controlGearDown (Width);
+		event controlGearShift (ShiftWidth, ShiftDirection);
 		event controlGearReverse;
 
 end

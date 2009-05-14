@@ -12,8 +12,8 @@ signature:
 		EngineState: {Attached, Detached};
 
 	items: 
-		TD engineState (EngineState);
-		TD actualSpeed;
+		TD total engineState: EngineState;
+		TD total actualSpeed: integer;
 
 	modules: 
 		hydraulicSystem: HydraulicSystem;
@@ -26,13 +26,11 @@ signature:
 		(direct engineState, torqueConverter.engineState)
 		(direct torqueConverter.commandDetach, hydraulicSystem.commandDetach)
 		(direct torqueConverter.commandAttach, hydraulicSystem.commandAttach)
-		(direct planetaryGearSet.gearUp, hydraulicSystem.gearUp)
-		(direct planetaryGearSet.gearDown, hydraulicSystem.gearDown)
+		(direct planetaryGearSet.gearShift, hydraulicSystem.gearShift)
 		(direct planetaryGearSet.gearReverse, hydraulicSystem.gearReverse)
 		(direct hydraulicSystem.controlCommandDetach, transmissionControlUnit.controlCommandDetach)
 		(direct hydraulicSystem.controlCommandAttach, transmissionControlUnit.controlCommandAttach)
-		(direct hydraulicSystem.controlGearUp, transmissionControlUnit.controlGearUp)
-		(direct hydraulicSystem.controlGearDown, transmissionControlUnit.controlGearDown)
+		(direct hydraulicSystem.controlGearShift, transmissionControlUnit.controlGearShift)
 		(direct hydraulicSystem.controlGearReverse, transmissionControlUnit.controlGearReverse)
 		(direct transmissionControlUnit.sendSpeed, speedSensor.sendSpeed)
 		(direct actualSpeed, speedSensor.actualSpeed)
