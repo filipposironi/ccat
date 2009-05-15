@@ -56,13 +56,13 @@ signature:
 		GearShiftsFromReverse:
 			(actualGear = Reverse -> Alw (not gearReverse & all gearShiftWidth (all gearShiftDirection (not gearShift (gearShiftWidth, gearShiftDirection))))) &
 			(actualGear = Reverse -> SomF (gearDrive | gearPark)) &
-			(all gear (gear <> Reverse & actualGear = gear & gearReverse)
+			((actualGear = First | actualGear = Park) & gearReverse
 				-> Futr (actualGear = Reverse, reverseGearShiftDelay));
 		
 		GearShiftsFromPark:
 			(actualGear = Park -> Alw (not gearPark & all gearShiftWidth (all gearShiftDirection (not gearShift (gearShiftWidth, gearShiftDirection))))) &
 			(actualGear = Park -> SomF (gearDrive | gearReverse)) &
-			(all gear (gear <> Park & actualGear = gear & gearPark)
+			((actualGear = First | actualGear = Reverse) & gearPark
 				-> Futr (actualGear = Park, parkGearShiftDelay));
 		
 		GearShiftsTimings:
