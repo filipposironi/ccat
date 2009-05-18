@@ -1,8 +1,8 @@
-class HydraulicSystem(const fluidDelay) 
+class HydraulicSystem(const fluidPropagationDelay) 
 
 signature: 
 
-	visible: gearHandle, commandDetach, commandAttach, gearShift, gearReverse, gearPark, gearDrive, controlCommandDetach, controlCommandAttach, controlGearShift;
+	visible: gearHandle, commandAttach, commandDetach, gearShift, gearDrive, gearPark, gearReverse, controlCommandDetach, controlCommandAttach, controlGearShift;
 
 	temporal domain: real;
 	
@@ -13,44 +13,48 @@ signature:
 
 	items: 
 		event gearHandle (GearPosition);
-		event commandDetach;
 		event commandAttach;
+		event commandDetach;
 		event gearShift (ShiftWidth, ShiftDirection);
-		event gearReverse;
-		event gearPark;
 		event gearDrive;
+		event gearPark;
+		event gearReverse;
 		event controlCommandDetach;
 		event controlCommandAttach;
 		event controlGearShift (ShiftWidth, ShiftDirection);
 		
 	axioms:
-		vars:
-			gear: GearPosition;
-			gearWidth: ShiftWidth;
-			gearDir: ShiftDirection;
-			t: real;
-			
-		formulae:		
+	vars:
+		gear: GearPosition;
+		gearShiftWidth: ShiftWidth;
+		gearShiftDirection: ShiftDirection;
+		t: real;
+	formulae:		
 		GearHandle: 
-			( gear=Drive & gearHandle(gear) -> ( ex t( 0<t<=fluidDelay & Futr(gearDrive, t) ) ) ) &
-			( gear=Park & gearHandle(gear) -> ( ex t( 0<t<=fluidDelay & Futr(gearPark, t) ) ) ) &
-			( gear=Reverse & gearHandle(gear) -> ( ex t( 0<t<=fluidDelay & Futr(gearReverse, t) ) ) );
-			
-		ControlGearShift:
-			all gearWidth( all gearDir ( controlGearShift(gearWidth, gearDir) -> ex t ( 0<t<=fluidDelay & Futr(gearShift(gearWidth, gearDir), t) )  ) );
-					
-		HandleConcurreny:
-			gearDrive -> all t (0 <= t <= fluidDelay -> not Futr( gearReverse | gearPark, t ) ) &
-			gearReverse -> all t (0 <= t <= fluidDelay -> not Futr( gearDrive | gearPark, t ) ) &
-			gearPark -> all t (0 <= t <= fluidDelay -> not Futr( gearReverse | gearDrive, t ) );
+			(gear = Drive & gearHandle (gear) ->
+				(ex t (0 < t <= fluidPropagationDelay & Futr (gearDrive, t)))) &
+			(gear = Park & gearHandle (gear) ->
+				(ex t (0 < t <= fluidPropagationDelay & Futr (gearPark, t)))) &
+			(gear = Reverse & gearHandle (gear) ->
+				(ex t (0 < t <= fluidPropagationDelay & Futr (gearReverse, t))));
+		
+		GearHandleEvent:
+			gearDrive -> all t (0 <= t <= fluidPropagationDelay -> not Futr(gearReverse | gearPark, t)) &
+			gearReverse -> all t (0 <= t <= fluidPropagationDelay -> not Futr(gearDrive | gearPark, t)) &
+			gearPark -> all t (0 <= t <= fluidPropagationDelay -> not Futr(gearReverse | gearDrive, t));
+		
+		PropagateGearShiftCommand:
+			all gearShiftWidth (all gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection) ->
+				ex t (0 < t <= fluidPropagationDelay & Futr (gearShift (gearShiftWidth, gearShiftDirection), t))));
+		
+		PropagateTorqueConverterCommand:
+			controlCommandAttach -> ex t (0 <= t <= fluidPropagationDelay & Futr (commandAttach, t)) &
+			controlCommandDetach -> ex t (0 <= t <= fluidPropagationDelay & Futr (commandDetach, t));
 			
 		/*
-		 * Considerando che il funzionamento del PlanetaryGearSet impedisce la selezione ripetuta della marcia attuale, 
-		 * si assume qui che la leva del cambio si comporti allo stesso modo.		 
-		 */	
-		
-		TorqueControl:
-			controlCommandDetach -> ex t( 0 <= t <= fluidDelay & Futr(commandDetach, t) ) &
-			controlCommandAttach -> ex t( 0 <= t <= fluidDelay & Futr(commandAttach, t) );		
+		 * Considerando che il funzionamento del PlanetaryGearSet impedisce la
+		 * selezione ripetuta della marcia attuale, si assume qui che la leva
+		 * del cambio si comporti in modo coerente.
+		 */
 
 end

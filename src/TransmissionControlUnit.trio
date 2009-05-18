@@ -21,6 +21,5 @@ signature:
 	 * Aggiungere le formule che impediscono la concorrenza tra gli eventi di
 	 * cambio marcia.
 	 */
-		 
 
 end
