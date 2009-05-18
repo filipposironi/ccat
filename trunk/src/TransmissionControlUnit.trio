@@ -16,5 +16,11 @@ signature:
 		event controlGearShift (ShiftWidth, ShiftDirection);
 		event controlGearReverse;
 		TD sendSpeed (integer);
+		
+	/*
+	 * Aggiungere le formule che impediscono la concorrenza tra gli eventi di
+	 * cambio marcia.
+	 */
+		 
 
 end

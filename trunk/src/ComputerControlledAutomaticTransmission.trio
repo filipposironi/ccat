@@ -28,10 +28,11 @@ signature:
 		(direct torqueConverter.commandAttach, hydraulicSystem.commandAttach)
 		(direct planetaryGearSet.gearShift, hydraulicSystem.gearShift)
 		(direct planetaryGearSet.gearReverse, hydraulicSystem.gearReverse)
+		(direct planetaryGearSet.gearDrive, hydraulicSystem.gearDrive)
+		(direct planetaryGearSet.gearPark, hydraulicSystem.gearPark)
 		(direct hydraulicSystem.controlCommandDetach, transmissionControlUnit.controlCommandDetach)
 		(direct hydraulicSystem.controlCommandAttach, transmissionControlUnit.controlCommandAttach)
 		(direct hydraulicSystem.controlGearShift, transmissionControlUnit.controlGearShift)
-		(direct hydraulicSystem.controlGearReverse, transmissionControlUnit.controlGearReverse)
 		(direct transmissionControlUnit.sendSpeed, speedSensor.sendSpeed)
 		(direct actualSpeed, speedSensor.actualSpeed)
 
