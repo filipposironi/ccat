@@ -1,8 +1,8 @@
-class HydraulicSystem 
+class HydraulicSystem(const fluidDelay) 
 
 signature: 
 
-	visible: gearHandle, commandDetach, commandAttach, gearShift, gearReverse, controlCommandDetach, controlCommandAttach, controlGearShift, controlGearReverse;
+	visible: gearHandle, commandDetach, commandAttach, gearShift, gearReverse, gearPark, gearDrive, controlCommandDetach, controlCommandAttach, controlGearShift;
 
 	temporal domain: real;
 	
@@ -17,9 +17,40 @@ signature:
 		event commandAttach;
 		event gearShift (ShiftWidth, ShiftDirection);
 		event gearReverse;
+		event gearPark;
+		event gearDrive;
 		event controlCommandDetach;
 		event controlCommandAttach;
 		event controlGearShift (ShiftWidth, ShiftDirection);
-		event controlGearReverse;
+		
+	axioms:
+		vars:
+			gear: GearPosition;
+			gearWidth: ShiftWidth;
+			gearDir: ShiftDirection;
+			t: real;
+			
+		formulae:		
+		GearHandle: 
+			( gear=Drive & gearHandle(gear) -> ( ex t( 0<t<=fluidDelay & Futr(gearDrive, t) ) ) ) &
+			( gear=Park & gearHandle(gear) -> ( ex t( 0<t<=fluidDelay & Futr(gearPark, t) ) ) ) &
+			( gear=Reverse & gearHandle(gear) -> ( ex t( 0<t<=fluidDelay & Futr(gearReverse, t) ) ) );
+			
+		ControlGearShift:
+			all gearWidth( all gearDir ( controlGearShift(gearWidth, gearDir) -> ex t ( 0<t<=fluidDelay & Futr(gearShift(gearWidth, gearDir), t) )  ) );
+					
+		HandleConcurreny:
+			gearDrive -> all t (0 <= t <= fluidDelay -> not Futr( gearReverse | gearPark, t ) ) &
+			gearReverse -> all t (0 <= t <= fluidDelay -> not Futr( gearDrive | gearPark, t ) ) &
+			gearPark -> all t (0 <= t <= fluidDelay -> not Futr( gearReverse | gearDrive, t ) );
+			
+		/*
+		 * Considerando che il funzionamento del PlanetaryGearSet impedisce la selezione ripetuta della marcia attuale, 
+		 * si assume qui che la leva del cambio si comporti allo stesso modo.		 
+		 */	
+		
+		TorqueControl:
+			controlCommandDetach -> ex t( 0 <= t <= fluidDelay & Futr(commandDetach, t) ) &
+			controlCommandAttach -> ex t( 0 <= t <= fluidDelay & Futr(commandAttach, t) );		
 
 end

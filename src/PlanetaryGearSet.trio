@@ -18,10 +18,6 @@ signature:
 		event gearReverse;
 		TD total actualGear: Gear;
 	
-	/*
-	 * Mancano le formule che impediscono la concorrenza tra gli eventi di
-	 * cambio marcia.
-	 */
 	axioms:
 	vars:
 		gearShiftWidth: ShiftWidth;
