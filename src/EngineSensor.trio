@@ -1,4 +1,4 @@
-class SpeedSensor 
+class EngineSensor 
 
 signature: 
 
@@ -6,7 +6,7 @@ signature:
 
 	temporal domain: real;
 
-	items: 
+	items:
 		TD total storedSpeed: integer;
 		TD total actualSpeed: integer;
 		TD total sendSpeed: integer;

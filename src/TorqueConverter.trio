@@ -1,4 +1,4 @@
-class TorqueConverter 
+class TorqueConverter (const fluidPropagationDelay)
 
 signature: 
 
@@ -9,9 +9,26 @@ signature:
 	domains:
 		EngineState: {Attached, Detached};
 
-	items: 
-		event commandDetach;
+	items:
 		event commandAttach;
-		TD engineState (EngineState);
-
+		event commandDetach;
+		TD total engineState: EngineState;
+	
+	axioms:
+	vars:
+		t1: real;
+		t2: real;
+		t3: real;
+		t4: real;
+	formulae:
+		TorqueConverterChangesState:
+			engineState = Attached & commandDetach ->
+				(ex t1 (0 < t1 <= fluidPropagationDelay & Futr (engineState = Detach, t1)) &
+				all t2 (0 < t2 <= fluidPropagationDelay -> not commandAttach)) &
+			engineState = Detached & commandAttach ->
+				(ex t3 (0 < t3 <= fluidPropagationDelay & Futr (engineState = Attach, t3)) &
+				all t4 (0 < t4 <= fluidPropagationDelay -> not commandDetach)) &
+			engineState = Attached -> Alw (not commandAttach) &
+			engineState = Detach -> Alw (not commandDetach);
+		
 end
