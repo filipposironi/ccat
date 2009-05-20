@@ -1,31 +1,33 @@
 class ComputerControlledAutomaticTransmission 
 
-import: HydraulicSystem, PlanetaryGearSet, TransmissionControlUnit, TorqueConverter, SpeedSensor;
+import: HydraulicSystem, PlanetaryGearSet, TransmissionControlUnit, VehicleSpeedSensor, EngineSpeedSensor;
 
 signature: 
 
-	visible: engineState, actualSpeed;
+	visible: torqueConverterState, vehicleSpeed, engineSpeed;
 
 	temporal domain: real;
 	
 	domains:
-		EngineState: {Attached, Detached};
+		TorqueConverterState: {Attached, Detached};
 
 	items: 
-		TD total engineState: EngineState;
-		TD total actualSpeed: integer;
+		TD total torqueConverterState: TorqueConverterState;
+		TD total vehicleSpeed: integer;
+		TD total engineSpeed: integer;
 
 	modules: 
 		hydraulicSystem: HydraulicSystem;
 		planetaryGearSet: PlanetaryGearSet;
 		transmissionControlUnit: TransmissionControlUnit;
-		torqueConverter: TorqueConverter;
-		speedSensor: SpeedSensor;
+		vehicleSpeedSensor: VehicleSpeedSensor;
+		engineSpeedSensor: EngineSpeedSensor;
 
-	connections: 
-		(direct engineState, torqueConverter.engineState)
-		(direct torqueConverter.commandDetach, hydraulicSystem.commandDetach)
-		(direct torqueConverter.commandAttach, hydraulicSystem.commandAttach)
+	connections:
+		(direct engineSpeed, EngineSpeedSensor.actualSpeed)
+		(direct vehicleSpeed, vehicleSpeedSensor.actualSpeed)
+		(direct torqueConverterState, planetaryGearSet.transmissionShaftState)
+		
 		(direct planetaryGearSet.gearShift, hydraulicSystem.gearShift)
 		(direct planetaryGearSet.gearDrive, hydraulicSystem.gearDrive)
 		(direct planetaryGearSet.gearPark, hydraulicSystem.gearPark)
@@ -33,7 +35,7 @@ signature:
 		(direct hydraulicSystem.controlCommandDetach, transmissionControlUnit.controlCommandDetach)
 		(direct hydraulicSystem.controlCommandAttach, transmissionControlUnit.controlCommandAttach)
 		(direct hydraulicSystem.controlGearShift, transmissionControlUnit.controlGearShift)
-		(direct transmissionControlUnit.sendSpeed, speedSensor.sendSpeed)
-		(direct actualSpeed, speedSensor.actualSpeed)
+		(direct transmissionControlUnit.receiveEngineSpeed, engineSpeedSensor.sendSpeed)
+		(direct transmissionControlUnit.receiveVehicleSpeed, vehicleSpeedSensor.sendSpeed)
 
 end

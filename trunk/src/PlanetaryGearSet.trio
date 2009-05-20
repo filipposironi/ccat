@@ -2,7 +2,7 @@ class PlanetaryGearSet (const singleGearShiftDelay, const dualGearShiftDelay, co
 
 signature: 
 
-	visible: gearShift, gearDrive, gearPark, gearReverse, actualGear;
+	visible: gearShift, gearDrive, gearPark, gearReverse, actualGear, transmissionShaftState;
 
 	temporal domain: real;
 	
@@ -10,6 +10,7 @@ signature:
 		Gear: {First, Second, Third, Park, Reverse};
 		ShiftWidth: 1..2;
 		ShiftDirection: {Up, Down};
+		TransmissionShaftState: {Attached, Detached};
 
 	items: 
 		event gearShift (ShiftWidth, ShiftDirection);
@@ -17,6 +18,7 @@ signature:
 		event gearPark;
 		event gearReverse;
 		TD total actualGear: Gear;
+		TD total transmissionShaftState: TransmissionShaftState;
 	
 	axioms:
 	vars:
@@ -85,5 +87,8 @@ signature:
 			(actualGear = Park & gearReverse) ->
 				not ex t6 (0 < t6 <= reverseGearShiftDelay & (Futr (gearDrive, t6) | Futr (gearPark, t6) | Futr (gearReverse, t6) | ex gearShiftWidth2 (ex gearShiftDirection2 (
 						Futr (gearShift (gearShiftWidth2, gearShiftDirection2), t6)))));
+						
+		GearParkShift:
+			Alw (gearPark | gearReverse <-> transmissionShaftState = Detached);
 						
 end
