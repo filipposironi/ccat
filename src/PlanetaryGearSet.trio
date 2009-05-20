@@ -1,8 +1,20 @@
-class PlanetaryGearSet (const singleGearShiftDelay, const dualGearShiftDelay, const driveGearShiftDelay, const parkGearShiftDelay, const reverseGearShiftDelay) 
+class PlanetaryGearSet (
+	const singleGearShiftDelay,
+	const dualGearShiftDelay,
+	const driveGearShiftDelay,
+	const parkGearShiftDelay,
+	const reverseGearShiftDelay
+)
 
 signature: 
 
-	visible: gearShift, gearDrive, gearPark, gearReverse, actualGear, transmissionShaftState;
+	visible:
+		gearShift,
+		gearDrive,
+		gearPark,
+		gearReverse,
+		actualGear,
+		transmissionShaftState;
 
 	temporal domain: real;
 	
@@ -19,6 +31,13 @@ signature:
 		event gearReverse;
 		TD total actualGear: Gear;
 		TD total transmissionShaftState: TransmissionShaftState;
+		/*
+		 * TI singleGearShiftDelay: real;
+		 * TI dualGearShiftDelay: real;
+		 * TI driveGearShiftDelay: real;
+		 * TI parkGearShiftDelay: real;
+		 * TI reverseGearShiftDelay: real;
+		 */
 	
 	axioms:
 	vars:
@@ -35,77 +54,320 @@ signature:
 		t6: real;
 	formulae:
 		GearDriveShift:
-			(actualGear = Reverse & gearDrive ->
-				(Futr (actualGear = First, driveGearShiftDelay) & Lasts (actualGear = Reverse, driveGearShiftDelay))) &
-			(actualGear = Park & gearDrive ->
-				(Futr (actualGear = First, driveGearShiftDelay) & Lasts (actualGear = Park, driveGearShiftDelay)));
+			(
+				actualGear = Reverse & gearDrive ->
+				(
+					Futr (actualGear = First, driveGearShiftDelay) &
+					Lasts (actualGear = Reverse, driveGearShiftDelay)
+				)
+			) &
+			(
+				actualGear = Park & gearDrive ->
+				(
+					Futr (actualGear = First, driveGearShiftDelay) &
+					Lasts (actualGear = Park, driveGearShiftDelay)
+				)
+			);
 				
 		GearShiftsFirst:
-			(actualGear = First -> Alw (not gearDrive & not ex gearShiftWidth (gearShiftDirection = Down & gearShift (gearShiftWidth, gearShiftDirection)))) &
-			(actualGear = First -> SomF (gearPark | gearReverse)) &
-			((actualGear = First & gearShiftWidth = 1 & gearShiftDirection = Up & gearShift (gearShiftWidth, gearShiftDirection))
-				-> Futr (actualGear = Second, singleGearShiftDelay) & Lasts (actualGear = First, singleGearShiftDelay)) & 
-			((actualGear = First & gearShiftWidth = 2 & gearShiftDirection = Up & gearShift (gearShiftWidth, gearShiftDirection))
-				-> Futr (actualGear = Third, dualGearShiftDelay) & Lasts (actualGear = First, dualGearShiftDelay));
+			(
+				actualGear = First ->
+				Alw
+				(
+					not gearDrive &
+					not ex gearShiftWidth
+					(
+						gearShiftDirection = Down &
+						gearShift (gearShiftWidth, gearShiftDirection)
+					)
+				)
+			) &
+			(
+				actualGear = First -> SomF (gearPark | gearReverse)
+			) &
+			(
+				actualGear = First & 
+				gearShiftWidth = 1 & gearShiftDirection = Up &
+				gearShift (gearShiftWidth, gearShiftDirection) ->
+				Futr (actualGear = Second, singleGearShiftDelay) &
+				Lasts (actualGear = First, singleGearShiftDelay)
+			) & 
+			(
+				actualGear = First &
+				gearShiftWidth = 2 & gearShiftDirection = Up &
+				gearShift (gearShiftWidth, gearShiftDirection) ->
+				Futr (actualGear = Third, dualGearShiftDelay) &
+				Lasts (actualGear = First, dualGearShiftDelay)
+			);
 		
 		GearShiftsSecond:
-			(actualGear = Second -> Alw (not gearDrive & not gearPark & not gearReverse & not ex gearShiftDirection (gearShiftWidth = 2 & gearShift (gearShiftWidth, gearShiftDirection)))) &
-			((actualGear = Second & gearShiftWidth = 1 & gearShiftDirection = Up & gearShift (gearShiftWidth, gearShiftDirection))
-				-> Futr (actualGear = Third, singleGearShiftDelay) & Lasts (actualGear = Second, singleGearShiftDelay)) &
-			((actualGear = Second & gearShiftWidth = 1 & gearShiftDirection = Down & gearShift (gearShiftWidth, gearShiftDirection))
-				-> Futr (actualGear = First, singleGearShiftDelay) & Lasts (actualGear = Second, singleGearShiftDelay));
+			(
+				actualGear = Second ->
+				Alw
+				(
+					not gearDrive & not gearPark & not gearReverse &
+					not ex gearShiftDirection
+					(
+						gearShiftWidth = 2 &
+						gearShift (gearShiftWidth, gearShiftDirection)
+					)
+				)
+			) &
+			(
+				actualGear = Second &
+				gearShiftWidth = 1 & gearShiftDirection = Up &
+				gearShift (gearShiftWidth, gearShiftDirection) ->
+				Futr (actualGear = Third, singleGearShiftDelay) &
+				Lasts (actualGear = Second, singleGearShiftDelay)
+			) &
+			(
+				actualGear = Second &
+				gearShiftWidth = 1 & gearShiftDirection = Down &
+				gearShift (gearShiftWidth, gearShiftDirection) ->
+				Futr (actualGear = First, singleGearShiftDelay) &
+				Lasts (actualGear = Second, singleGearShiftDelay)
+			);
 		
 		GearShiftsThird:
-			(actualGear = Third -> Alw (not gearDrive & not gearPark & not gearReverse & not ex gearShiftWidth (gearShiftDirection = Up & gearShift (gearShiftWidth, gearShiftDirection)))) &
-			((actualGear = Third & gearShiftWidth = 1 & gearShiftDirection = Down & gearShift (gearShiftWidth, gearShiftDirection))
-				-> Futr (actualGear = Second, singleGearShiftDelay) & Lasts (actualGear = Third, singleGearShiftDelay)) &
-			((actualGear = Third & gearShiftWidth = 2 & gearShiftDirection = Down & gearShift (gearShiftWidth, gearShiftDirection))
-				-> Futr (actualGear = First, dualGearShiftDelay) & Lasts (actualGear = Third, dualGearShiftDelay));
+			(
+				actualGear = Third ->
+				Alw
+				(
+					not gearDrive & not gearPark & not gearReverse &
+					not ex gearShiftWidth
+					(
+						gearShiftDirection = Up &
+						gearShift (gearShiftWidth, gearShiftDirection)
+					)
+				)
+			) &
+			(
+				actualGear = Third &
+				gearShiftWidth = 1 & gearShiftDirection = Down &
+				gearShift (gearShiftWidth, gearShiftDirection) ->
+				Futr (actualGear = Second, singleGearShiftDelay) &
+				Lasts (actualGear = Third, singleGearShiftDelay)
+			) &
+			(
+				actualGear = Third &
+				gearShiftWidth = 2 & gearShiftDirection = Down &
+				gearShift (gearShiftWidth, gearShiftDirection) ->
+				Futr (actualGear = First, dualGearShiftDelay) &
+				Lasts (actualGear = Third, dualGearShiftDelay)
+			);
 		
 		GearShiftsReverse:
-			(actualGear = Reverse -> Alw (not gearReverse & all gearShiftWidth (all gearShiftDirection (not gearShift (gearShiftWidth, gearShiftDirection))))) &
+			(
+				actualGear = Reverse ->
+				Alw
+				(
+					not gearReverse &
+					all gearShiftWidth, gearShiftDirection
+					(
+						not gearShift (gearShiftWidth, gearShiftDirection)
+					)
+				)
+			) &
 			(actualGear = Reverse -> SomF (gearDrive | gearPark)) &
-			(actualGear = First & gearReverse
-				-> Futr (actualGear = Reverse, reverseGearShiftDelay) & Lasts (actualGear = First, reverseGearShiftDelay)) &
-			(actualGear = Park & gearReverse
-				-> Futr (actualGear = Reverse, reverseGearShiftDelay)  & Lasts (actualGear = Park, reverseGearShiftDelay)) &
+			(
+				actualGear = First & gearReverse ->
+				Futr (actualGear = Reverse, reverseGearShiftDelay) &
+				Lasts (actualGear = First, reverseGearShiftDelay)
+			) &
+			(
+				actualGear = Park & gearReverse	->
+				Futr (actualGear = Reverse, reverseGearShiftDelay) &
+				Lasts (actualGear = Park, reverseGearShiftDelay)
+			) &
 			(gearReverse <-> transmissionShaftState = Detached);
 		
 		GearShiftsPark:
-			(actualGear = Park -> Alw (not gearPark & all gearShiftWidth (all gearShiftDirection (not gearShift (gearShiftWidth, gearShiftDirection))))) &
+			(
+				actualGear = Park ->
+				Alw
+				(
+					not gearPark &
+					all gearShiftWidth, gearShiftDirection
+					(
+						not gearShift (gearShiftWidth, gearShiftDirection)
+					)
+				)
+			) &
 			(actualGear = Park -> SomF (gearDrive | gearReverse)) &
-			(actualGear = First & gearPark
-				-> Futr (actualGear = Park, parkGearShiftDelay) & Lasts (actualGear = First, parkGearShiftDelay)) &
-			(actualGear = Reverse & gearPark
-				-> Futr (actualGear = Park, parkGearShiftDelay) & Lasts (actualGear = Reverse, parkGearShiftDelay)) &
+			(
+				actualGear = First & gearPark ->
+				Futr (actualGear = Park, parkGearShiftDelay) &
+				Lasts (actualGear = First, parkGearShiftDelay)
+			) &
+			(
+				actualGear = Reverse & gearPark ->
+				Futr (actualGear = Park, parkGearShiftDelay) &
+				Lasts (actualGear = Reverse, parkGearShiftDelay)
+			) &
 			(gearPark <-> transmissionShaftState = Detached);
 			
 		GearShiftsTimings:
-			all gearShiftDirection ((actualGear = First | actualGear = Second | actualGear = Third) & gearShiftWidth = 1 & gearShift (gearShiftWidth, gearShiftDirection) ->
-				not ex t1 (0 < t1 <= singleGearShiftDelay & ((Futr (gearDrive, t1) | Futr (gearPark, t1) | Futr (gearReverse, t1) | ex gearShiftWidth2 (ex gearShiftDirection2 (
-						Futr (gearShift (gearShiftWidth2, gearShiftDirection2), t1))))))) &
-			all gearShiftDirection ((actualGear = First | actualGear = Third) & gearShiftWidth = 2 & gearShift (gearShiftWidth, gearShiftDirection) ->
-				not ex t2 (0 < t <= dualGearShiftDelay & ((Futr (gearDrive, t2) | Futr (gearPark, t2) | Futr (gearReverse, t2) | ex gearShiftWidth2 (ex gearShiftDirection2 (
-						Futr (gearShift (gearShiftWidth2, gearShiftDirection2), t2))))))) &
-			(actualGear = Reverse & gearDrive) ->
-				not ex t3 (0 < t3 <= driveGearShiftDelay & ((Futr (gearDrive, t3) | Futr (gearPark, t3) | Futr (gearReverse, t3) | ex gearShiftWidth2 (ex gearShiftDirection2 (
-						Futr (gearShift (gearShiftWidth2, gearShiftDirection2), t3)))))) &
-			(actualGear = Reverse & gearPark) ->
-				not ex t4 (0 < t4 <= parkGearShiftDelay & ((Futr (gearDrive, t4) | Futr (gearPark, t4) | Futr (gearReverse, t4) | ex gearShiftWidth2 (ex gearShiftDirection2 (
-						Futr (gearShift (gearShiftWidth2, gearShiftDirection2), t4)))))) &
-			(actualGear = Park & gearDrive) ->
-				not ex t5 (0 < t5 <= driveGearShiftDelay & ((Futr (gearDrive, t5) | Futr (gearPark, t5) | Futr (gearReverse, t5) | ex gearShiftWidth2 (ex gearShiftDirection2 (
-						Futr (gearShift (gearShiftWidth2, gearShiftDirection2), t5)))))) &
-			(actualGear = Park & gearReverse) ->
-				not ex t6 (0 < t6 <= reverseGearShiftDelay & ((Futr (gearDrive, t6) | Futr (gearPark, t6) | Futr (gearReverse, t6) | ex gearShiftWidth2 (ex gearShiftDirection2 (
-						Futr (gearShift (gearShiftWidth2, gearShiftDirection2), t6))))));
+			all gearShiftDirection
+			(
+				(actualGear = First | actualGear = Second | actualGear = Third)
+				&
+				gearShiftWidth = 1 &
+				gearShift (gearShiftWidth, gearShiftDirection) ->
+				not ex t1
+				(
+					0 < t1 <= singleGearShiftDelay &
+					(
+						(
+							Futr (gearDrive, t1) |
+							Futr (gearPark, t1) |
+							Futr (gearReverse, t1) |
+							ex gearShiftWidth2, gearShiftDirection2
+							(
+								Futr
+								(
+									gearShift (
+										gearShiftWidth2, gearShiftDirection2
+									),
+									t1
+								)
+							)
+						)
+					)
+				)
+			) &
+			all gearShiftDirection
+			(
+				(actualGear = First | actualGear = Third) &
+				gearShiftWidth = 2 &
+				gearShift (gearShiftWidth, gearShiftDirection) ->
+				not ex t2
+				(
+					0 < t <= dualGearShiftDelay &
+					(
+						(
+							Futr (gearDrive, t2) |
+							Futr (gearPark, t2) |
+							Futr (gearReverse, t2) |
+							ex gearShiftWidth2, gearShiftDirection2
+							(
+								Futr
+								(
+									gearShift (
+										gearShiftWidth2, gearShiftDirection2
+									),
+									t2
+								)
+							)
+						)
+					)
+				)
+			) &
+			(
+				(actualGear = Reverse & gearDrive) ->
+				not ex t3
+				(
+					0 < t3 <= driveGearShiftDelay &
+					(
+						(
+							Futr (gearDrive, t3) |
+							Futr (gearPark, t3) |
+							Futr (gearReverse, t3) |
+							ex gearShiftWidth2, gearShiftDirection2
+							(
+								Futr
+								(
+									gearShift (
+										gearShiftWidth2, gearShiftDirection2
+									),
+									t3
+								)
+							)
+						)
+					)
+				)
+			) &
+			(
+				(actualGear = Reverse & gearPark) ->
+				not ex t4
+				(
+					0 < t4 <= parkGearShiftDelay &
+					(
+						(
+							Futr (gearDrive, t4) |
+							Futr (gearPark, t4) |
+							Futr (gearReverse, t4) |
+							ex gearShiftWidth2, gearShiftDirection2
+							(
+								Futr
+								(
+									gearShift (
+										gearShiftWidth2, gearShiftDirection2
+									), t4
+								)
+							)
+						)
+					)
+				)
+			) &
+			(
+				(actualGear = Park & gearDrive) ->
+				not ex t5
+				(
+					0 < t5 <= driveGearShiftDelay &
+					(
+						(
+							Futr (gearDrive, t5) |
+							Futr (gearPark, t5) |
+							Futr (gearReverse, t5) |
+							ex gearShiftWidth2, gearShiftDirection2
+							(
+								Futr
+								(
+									gearShift (
+										gearShiftWidth2, gearShiftDirection2
+									),
+									t5
+								)
+							)
+						)
+					)
+				)
+			) &
+			(
+				(actualGear = Park & gearReverse) ->
+				not ex t6
+				(
+					0 < t6 <= reverseGearShiftDelay &
+					(
+						(
+							Futr (gearDrive, t6) |
+							Futr (gearPark, t6) |
+							Futr (gearReverse, t6) |
+							ex gearShiftWidth2, gearShiftDirection2
+							(
+								Futr
+								(
+									gearShift (
+										gearShiftWidth2, gearShiftDirection2
+									),
+									t6
+								)
+							)
+						)
+					)
+				)
+			);
 
 		Nothing:
-			all gear (
+			all gear
+			(
 				actualGear = gear &
 				not
 				(
-					all gearShiftWidth (all gearShiftDirection (gearShift (gearShiftWidth, gearShiftDirection))) |
+					all gearShiftWidth, gearShiftDirection
+					(
+						gearShift (gearShiftWidth, gearShiftDirection)
+					) |
 					gearDrive |
 					gearPark |
 					gearReverse

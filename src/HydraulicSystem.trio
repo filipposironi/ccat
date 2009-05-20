@@ -18,10 +18,14 @@ signature:
 		event gearPark;
 		event gearReverse;
 		event controlGearShift (ShiftWidth, ShiftDirection);
+		/*
+		 * TI fluidPropagationDelay: real;
+		 */
 		
 	axioms:
 	vars:
 		gear: GearPosition;
+		gear2: GearPosition;
 		gearShiftWidth: ShiftWidth;
 		gearShiftDirection: ShiftDirection;
 		t1: real;
@@ -29,26 +33,48 @@ signature:
 		t3: real;
 	formulae:		
 		GearHandle: 
-			(gear = Drive & gearHandle (gear) ->
-				(ex t1 (0 < t1 <= fluidPropagationDelay & Futr (gearDrive, t1)))) &
-			(gear = Park & gearHandle (gear) ->
-				(ex t2 (0 < t2 <= fluidPropagationDelay & Futr (gearPark, t2)))) &
-			(gear = Reverse & gearHandle (gear) ->
-				(ex t3 (0 < t3 <= fluidPropagationDelay & Futr (gearReverse, t3))));
+			(
+				gear = Drive & gearHandle (gear) ->
+				ex t1 (0 < t1 <= fluidPropagationDelay &
+					Futr (gearDrive, t1))
+			) &
+			(
+				gear = Park & gearHandle (gear) ->
+				ex t2 (0 < t2 <= fluidPropagationDelay &
+					Futr (gearPark, t2))
+			) &
+			(
+				gear = Reverse & gearHandle (gear) ->
+				ex t3 (0 < t3 <= fluidPropagationDelay &
+					Futr (gearReverse, t3))
+			);
 		
 		GearHandleEvent:
-			gearDrive -> all t1 (0 <= t1 <= fluidPropagationDelay -> not Futr(gearReverse | gearPark, t1)) &
-			gearReverse -> all t2 (0 <= t2 <= fluidPropagationDelay -> not Futr(gearDrive | gearPark, t2)) &
-			gearPark -> all t3 (0 <= t3 <= fluidPropagationDelay -> not Futr(gearReverse | gearDrive, t3));
+			(
+				gearDrive ->
+				all t1 (0 <= t1 <= fluidPropagationDelay ->
+					not Futr (gearReverse | gearPark, t1))
+			) &
+			(
+				gearReverse ->
+				all t2 (0 <= t2 <= fluidPropagationDelay ->
+					not Futr (gearDrive | gearPark, t2))
+			) &
+			(
+				gearPark ->
+				all t3 (0 <= t3 <= fluidPropagationDelay ->
+					not Futr (gearReverse | gearDrive, t3))
+			);
 		
 		PropagateGearShiftCommand:
-			all gearShiftWidth (all gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection) ->
-				ex t1 (0 < t1 <= fluidPropagationDelay & Futr (gearShift (gearShiftWidth, gearShiftDirection), t1))));
-							
-		/*
-		 * Considerando che il funzionamento del PlanetaryGearSet impedisce la
-		 * selezione ripetuta della marcia attuale, si assume qui che la leva
-		 * del cambio si comporti in modo coerente.
-		 */
+			all gearShiftWidth, gearShiftDirection (
+				controlGearShift (gearShiftWidth, gearShiftDirection) ->
+				ex t1 (0 < t1 <= fluidPropagationDelay &
+					Futr (gearShift (gearShiftWidth, gearShiftDirection), t1)));
+		
+		MutualExclusions:
+			all gear (
+				gearHandle (gear) ->
+				all gear2 (gear <> gear2 -> not gearHandle (gear2)));
 
 end
