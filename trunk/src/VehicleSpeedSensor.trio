@@ -1,8 +1,13 @@
-class VehicleSpeedSensor (const sampleInterval, const sampleDelay)
+class VehicleSpeedSensor (
+	const sampleInterval,
+	const sampleDelay
+)
 
 signature: 
 
-	visible: actualSpeed, sendSpeed;
+	visible:
+		actualSpeed,
+		sendSpeed;
 
 	temporal domain: real;
 
@@ -11,6 +16,10 @@ signature:
 		TD total actualSpeed: integer;
 		event sendSpeed (integer, integer);
 		event sampleSpeed;
+		/*
+		 * TI sampleInterval: real;
+		 * TI sampleDelay: real;
+		 */
 		
 	axioms:
 	vars:
@@ -18,22 +27,31 @@ signature:
 		deltaSpeed: integer;
 		speed: integer;
 	formulae:
-		SamplingDefinition:
-			sampleSpeed ->
-				Futr (sampleSpeed, sampleInterval) &
-				all t (0 < t < sampleInterval & Futr (not sampleSpeed, t));
-			
-		SamplingAction:
-			sampleSpeed ->
-				Futr (
-					deltaSpeed = actualSpeed - storedSpeed & speed = actualSpeed &
-						sendSpeed (deltaSpeed, speed) &
-					Lasts (storedSpeed = actualSpeed, sampleInterval),
-					sampleDelay
-				);
-		
 		SpeedValues:
 			actualSpeed >= 0 &
 			storedSpeed >= 0;
+			
+		BeginSample:
+			SomP (sampleSpeed);
+			
+		SamplingDefinition:
+			sampleSpeed ->
+			Futr (sampleSpeed, sampleInterval) &
+			all t (0 < t < sampleInterval -> Futr (not sampleSpeed, t));
+			
+		SamplingAction:
+			sampleSpeed ->
+			Futr
+			(
+				deltaSpeed = actualSpeed - storedSpeed & speed = actualSpeed &
+				sendSpeed (deltaSpeed, speed) &
+				Lasts (storedSpeed = actualSpeed, sampleInterval),
+				sampleDelay
+			);
+			
+		SendSpeed:
+			deltaSpeed = actualSpeed - storedSpeed & actualSpeed = speed &
+			sendSpeed (deltaSpeed, speed) ->
+			Past (sampleSpeed, -sampleDelay);
 
 end

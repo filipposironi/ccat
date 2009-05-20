@@ -10,26 +10,33 @@ signature:
 		TD total actualSpeed: integer;
 		event sendSpeed (integer);
 		event sampleSpeed;
+		/*
+		 * TI sampleInterval: real;
+		 * TI sampleDelay: real;
+		 */
 	
 	axioms:
 	vars:
 		t: real;
 		speed: integer;
 	formulae:
+		SpeedValues:
+			actualSpeed >= 0;
+			
+		BeginSample:
+			SomP (sampleSpeed);
+			
 		SamplingDefinition:
 			sampleSpeed ->
 				Futr (sampleSpeed, sampleInterval) &
-				all t (0 < t < sampleInterval & Futr (not sampleSpeed, t));
+				all t (0 < t < sampleInterval -> Futr (not sampleSpeed, t));
 			
 		SampleSpeedActions:
 			sampleSpeed ->
 				Futr (actualSpeed = speed & sendSpeed (speed), sampleDelay);
-		
-		SpeedValues:
-			actualSpeed >= 0;
 			
 		SendSpeed:
 			actualSpeed = speed & sendSpeed (speed) ->
 				Past (sampleSpeed, -sampleDelay);
-				
+								
 end
