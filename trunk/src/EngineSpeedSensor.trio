@@ -21,11 +21,15 @@ signature:
 				Futr (sampleSpeed, sampleInterval) &
 				all t (0 < t < sampleInterval & Futr (not sampleSpeed, t));
 			
-		SamplingActions:
+		SampleSpeedActions:
 			sampleSpeed ->
 				Futr (actualSpeed = speed & sendSpeed (speed), sampleDelay);
 		
 		SpeedValues:
 			actualSpeed >= 0;
-
+			
+		SendSpeed:
+			actualSpeed = speed & sendSpeed (speed) ->
+				Past (sampleSpeed, -sampleDelay);
+				
 end
