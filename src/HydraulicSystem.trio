@@ -2,7 +2,7 @@ class HydraulicSystem (const fluidPropagationDelay)
 
 signature: 
 
-	visible: gearHandle, commandAttach, commandDetach, gearShift, gearDrive, gearPark, gearReverse, controlCommandAttach, controlCommandDetach, controlGearShift;
+	visible: gearHandle, gearShift, gearDrive, gearPark, gearReverse, controlGearShift;
 
 	temporal domain: real;
 	
@@ -13,14 +13,10 @@ signature:
 
 	items: 
 		event gearHandle (GearPosition);
-		event commandAttach;
-		event commandDetach;
 		event gearShift (ShiftWidth, ShiftDirection);
 		event gearDrive;
 		event gearPark;
 		event gearReverse;
-		event controlCommandAttach;
-		event controlCommandDetach;
 		event controlGearShift (ShiftWidth, ShiftDirection);
 		
 	axioms:
@@ -48,11 +44,7 @@ signature:
 		PropagateGearShiftCommand:
 			all gearShiftWidth (all gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection) ->
 				ex t1 (0 < t1 <= fluidPropagationDelay & Futr (gearShift (gearShiftWidth, gearShiftDirection), t1))));
-		
-		PropagateTorqueConverterCommand:
-			controlCommandAttach -> ex t1 (0 < t1 <= fluidPropagationDelay & Futr (commandAttach, t1)) &
-			controlCommandDetach -> ex t2 (0 < t2 <= fluidPropagationDelay & Futr (commandDetach, t2));
-			
+							
 		/*
 		 * Considerando che il funzionamento del PlanetaryGearSet impedisce la
 		 * selezione ripetuta della marcia attuale, si assume qui che la leva

@@ -2,7 +2,7 @@ class TransmissionControlUnit
 
 signature: 
 
-	visible: controlCommandDetach, controlCommandAttach, controlGearShift, controlGearReverse, sendSpeed;
+	visible: controlGearShift, receiveEngineSpeed, receiveVehicleSpeed;
 
 	temporal domain: real;
 	
@@ -11,15 +11,50 @@ signature:
 		ShiftDirection: {Up, Down};
 
 	items: 
-		event controlCommandDetach;
-		event controlCommandAttach;
 		event controlGearShift (ShiftWidth, ShiftDirection);
-		event controlGearReverse;
-		TD sendSpeed (integer);
+		event receiveEngineSpeed (integer);
+		event receiveVehicleSpeed (integer, integer);
 		
 	/*
 	 * Aggiungere le formule che impediscono la concorrenza tra gli eventi di
 	 * cambio marcia.
 	 */
-
+	 axioms:
+	 vars:
+	 	engineSpeed: integer;
+	 	deltaVehicleSpeed: integer;
+	 	vehicleSpeed: integer;
+	 	gearShiftWidth: ShiftWidth;
+	 	gearShiftDirection: ShiftDirection;
+	 formulae:
+	 	/*
+	 	 * Non abbiamo modellato il cambio di 2 marce verso l'alto o verso il
+	 	 * basso perché non esiste un cambio automatico che funziona in questo
+	 	 * modo.
+	 	 * Tuttavia, i requisiti di tempo e gli eventi per effettuare
+	 	 * l'operazione sono presenti e modellati.
+	 	 */
+	 	 
+	 	/*
+		 * Considerando che la velocità di funzionamento dell'elettronica e'
+		 * normalmente superiore alla velocità di funzionamento della meccanica
+		 * ed ai tempi di reazione umani possiamo assumere che quando il
+		 * veicolo si ferma il tempo necessario per campionare la velocita'
+		 * e portare il veicolo in prima marcia e' inferiore al tempo necessario
+		 * all'utente per ripartire.
+		 */
+	 	GearShifts:
+		 	(receiveEngineSpeed (engineSpeed) & receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
+		 		engineSpeed >= 3000 & vehicleSpeed > 0 ->
+		 		gearShiftWidth = 1 & gearShiftDirection = Up & controlGearShift (gearShiftWidth, gearShiftDirection)) &
+		 	(receiveEngineSpeed (engineSpeed) & receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
+		 		engineSpeed <= 1500 & deltaVehicleSpeed < 0 ->
+		 		gearShiftWidth = 1 & gearShiftDirection = Down & controlGearShift (gearShiftWidth, gearShiftDirection)) &
+		 	(receiveEngineSpeed (engineSpeed) & receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
+		 		engineSpeed <= 1500 & deltaVehicleSpeed >= 0 & vehicleSpeed > 0 ->
+					all gearShiftWidth (all gearShiftDirection (not controlGearShift (gearShiftWidth, gearShiftDirection)))) &
+			(receiveEngineSpeed (engineSpeed) & receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
+				engineSpeed >= 1500 & engineSpeed < 3000 ->
+					all gearShiftWidth (all gearShiftDirection (not controlGearShift (gearShiftWidth, gearShiftDirection))));
+		 
 end
