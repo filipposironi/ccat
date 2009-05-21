@@ -67,7 +67,8 @@ signature:
 					Futr (actualGear = First, driveGearShiftDelay) &
 					Lasts (actualGear = Park, driveGearShiftDelay)
 				)
-			);
+			) &
+			(gearDrive <-> transmissionShaftState = Detached);
 				
 		GearShiftsFirst:
 			(
@@ -372,7 +373,8 @@ signature:
 					gearPark |
 					gearReverse
 				) ->
-				ex t1 (t1 > 0 & Lasts (actualGear = gear, t1))
+				ex t1 (t1 > 0 & Lasts (actualGear = gear, t1)) &
+				ex t2 (t2 > 0 & Lasted (actualGear = gear, t2))
 			);
 			
 end

@@ -37,6 +37,6 @@ signature:
 			
 		SendSpeed:
 			actualSpeed = speed & sendSpeed (speed) ->
-				Past (sampleSpeed, -sampleDelay);
+				Past (sampleSpeed, sampleDelay);
 								
 end
