@@ -22,6 +22,11 @@ signature:
 		 */
 		
 	axioms:
+		/*
+		 * Supponiamo che ad ogni evento di campionamento la variabile di stato
+		 * actualValue venga automaticamente aggiornata con il nuovo valore
+		 * della velocita' attuale.
+		 */
 	vars:
 		t: real;
 		deltaSpeed: integer;
@@ -30,15 +35,34 @@ signature:
 		SpeedValues:
 			actualSpeed >= 0 &
 			storedSpeed >= 0;
-			
+		
+		/*
+		 * In passato e' stato effettuato il primo campionamento. Questo assioma
+		 * permette di "avviare" la serie di campionamenti a frequenza costante.
+		 *
+		 * NB: e' la condizione iniziale del sensore.
+		 */
 		BeginSample:
 			SomP (sampleSpeed);
-			
+		
+		/*
+		 * Definizione di campionamento a frequenza costante.
+		 */
 		SamplingDefinition:
 			sampleSpeed ->
 			Futr (sampleSpeed, sampleInterval) &
 			all t (0 < t < sampleInterval -> Futr (not sampleSpeed, t));
 			
+		/*
+		 * Questo assioma descrive le azioni che il sensore compie ad ogni
+		 * campionamento. Per ogni campionamento il sensore solleva un evento
+		 * per inviare i valori letti al TCU ed effettua questa operazione con
+		 * ritardo costante.
+		 *
+		 * NB: questo assioma modella il salvataggio del valore attuale della
+		 * velocita' in una memoria ed impone che tale uguaglianza sia vera
+		 * fino al successivo campionamento.
+		 */
 		SamplingAction:
 			sampleSpeed ->
 			Futr
@@ -49,6 +73,10 @@ signature:
 				sampleDelay
 			);
 			
+		/*
+		 * Questo assioma garantisce che ad ogni eventi di sendSpeed corrisponda
+		 * un evento di campionamento passato.
+		 */
 		SendSpeed:
 			deltaSpeed = actualSpeed - storedSpeed & actualSpeed = speed &
 			sendSpeed (deltaSpeed, speed) ->

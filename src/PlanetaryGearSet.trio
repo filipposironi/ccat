@@ -54,6 +54,12 @@ signature:
 		t6: real;
 	formulae:
 		GearDriveShift:
+			/*
+		 	 * Questo assioma indica quando e' e quando non e' possibile
+		 	 * attivare la modalita' Drive del cambio. Per ogni evento di
+		 	 * gearDrive impone che la marcia attualmente innestata rimanga
+		 	 * attiva fino al termine dell'operazione di cambiata.
+		 	 */
 			(
 				actualGear = Reverse & gearDrive ->
 				(
@@ -68,9 +74,30 @@ signature:
 					Lasts (actualGear = Park, driveGearShiftDelay)
 				)
 			) &
+			(
+				actualGear = First |
+				actualGear = Second |
+				actualGear = Third ->
+				not gearDrive
+			) &
+			/*
+			 * L'attivazione della modalita' Drive e' possibile unicamente se
+			 * l'albero di trasmissione e' fermo (questo significa che il
+			 * Torque Converter ha fisicamente disaccoppiato il motore
+			 * dall'albero di trasmissione).
+			 */
 			(gearDrive <-> transmissionShaftState = Detached);
 				
 		GearShiftsFirst:
+			/*
+			 * Questo assioma indica le operazioni che non possono essere
+			 * attivate quando il cambio e' in prima marcia, ed inoltre,
+			 * modella il comportamento del cambio quando si vogliono innestare
+			 * una o due marce imponendo che durante l'operazione di cambiata
+			 * la prima marcia rimanga attiva.
+			 *
+			 * NB: la scalata e' impedita.
+			 */
 			(
 				actualGear = First ->
 				Alw
@@ -102,6 +129,15 @@ signature:
 			);
 		
 		GearShiftsSecond:
+			/*
+			 * Questo assioma indica le operazioni che non possono essere
+			 * attivate quando il cambio e' in seconda marcia, ed inoltre,
+			 * modella il comportamento del cambio quando si vuole innestare
+			 * o togliere una marcia imponendo che durante l'operazione di
+			 * cambiata la seconda marcia rimanga attiva.
+			 *
+			 * NB: la scalata o l'innesto di due marce e' impedita.
+			 */
 			(
 				actualGear = Second ->
 				Alw
@@ -130,6 +166,15 @@ signature:
 			);
 		
 		GearShiftsThird:
+			/*
+			 * Questo assioma indica le operazioni che non possono essere
+			 * attivate quando il cambio e' in terza marcia, ed inoltre,
+			 * modella il comportamento del cambio quando si vogliono scalare
+			 * una o due marce imponendo che durante l'operazione di cambiata
+			 * la terza marcia rimanga attiva.
+			 *
+			 * NB: l'innesto e' impedito.
+			 */
 			(
 				actualGear = Third ->
 				Alw
@@ -158,6 +203,12 @@ signature:
 			);
 		
 		GearShiftsReverse:
+			/*
+		 	 * Questo assioma indica quando e' e quando non e' possibile
+		 	 * attivare la modalita' Reverse del cambio. Per ogni evento di
+		 	 * gearReverse impone che la marcia attualmente innestata rimanga
+		 	 * attiva fino al termine dell'operazione di cambiata.
+		 	 */
 			(
 				actualGear = Reverse ->
 				Alw
@@ -180,9 +231,21 @@ signature:
 				Futr (actualGear = Reverse, reverseGearShiftDelay) &
 				Lasts (actualGear = Park, reverseGearShiftDelay)
 			) &
+			/*
+			 * L'attivazione della modalita' Reverse e' possibile unicamente se
+			 * l'albero di trasmissione e' fermo (questo significa che il
+			 * Torque Converter ha fisicamente disaccoppiato il motore
+			 * dall'albero di trasmissione).
+			 */
 			(gearReverse <-> transmissionShaftState = Detached);
 		
 		GearShiftsPark:
+			/*
+		 	 * Questo assioma indica quando e' e quando non e' possibile
+		 	 * attivare la modalita' Park del cambio. Per ogni evento di
+		 	 * gearPark impone che la marcia attualmente innestata rimanga
+		 	 * attiva fino al termine dell'operazione di cambiata.
+		 	 */
 			(
 				actualGear = Park ->
 				Alw
@@ -205,9 +268,20 @@ signature:
 				Futr (actualGear = Park, parkGearShiftDelay) &
 				Lasts (actualGear = Reverse, parkGearShiftDelay)
 			) &
+			/*
+			 * L'attivazione della modalita' Park e' possibile unicamente se
+			 * l'albero di trasmissione e' fermo (questo significa che il
+			 * Torque Converter ha fisicamente disaccoppiato il motore
+			 * dall'albero di trasmissione).
+			 */
 			(gearPark <-> transmissionShaftState = Detached);
 			
 		GearShiftsTimings:
+			/*
+			 * Questo assioma impone che durante il tempo necessario per attuare
+			 * la cambiata non possano essere sollevati altri eventi di
+			 * cambiata.
+			 */
 			all gearShiftDirection
 			(
 				(actualGear = First | actualGear = Second | actualGear = Third)
@@ -360,6 +434,10 @@ signature:
 			);
 
 		Nothing:
+			/*
+			 * Questo assioma garantisce che se non si ricevono eventi di
+			 * cambiata allora lo stato del sistema permane.
+			 */
 			all gear
 			(
 				actualGear = gear &
