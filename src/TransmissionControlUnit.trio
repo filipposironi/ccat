@@ -17,12 +17,21 @@ signature:
 		event controlGearShift (ShiftWidth, ShiftDirection);
 		event receiveEngineSpeed (integer);
 		event receiveVehicleSpeed (integer, integer);
+		TD total storedEngineSpeed: integer;
+		TD total storedDeltaVehicleSpeed: integer;
+		TD total storedVehicleSpeed: integer;
 		
 	 axioms:
 	 vars:
 	 	engineSpeed: integer;
+	 	engineSpeed1: integer;
+	 	engineSpeed2: integer;
 	 	deltaVehicleSpeed: integer;
+	 	deltaVehicleSpeed1: integer;
+	 	deltaVehicleSpeed2: integer;
 	 	vehicleSpeed: integer;
+	 	vehicleSpeed1: integer;
+	 	vehicleSpeed2: integer;
 	 	gearShiftWidth1: ShiftWidth;
 	 	gearShiftWidth2: ShiftWidth;
 	 	gearShiftDirection1: ShiftDirection;
@@ -47,12 +56,56 @@ signature:
 		 	) &
 		 	(
 		 		receiveEngineSpeed (engineSpeed) &
+		 		all deltaVehicleSpeed, vehicleSpeed
+		 		(
+		 			not receiveVehicleSpeed (
+		 				deltaVehicleSpeed, vehicleSpeed
+		 			)
+		 		) &
+		 		engineSpeed >= 3000 &
+		 		storedVehicleSpeed > 0 ->
+		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Up &
+		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
+		 	) &
+		 	(
+		 		all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
+		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
+		 		storedEngineSpeed >= 3000 &
+		 		vehicleSpeed > 0 ->
+		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Up &
+		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
+		 	) &
+		 	/* */
+		 	(
+		 		receiveEngineSpeed (engineSpeed) &
 		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
 		 		engineSpeed <= 1500 &
 		 		deltaVehicleSpeed <= 0 ->
 		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Down &
 		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
 		 	) &
+		 	(
+		 		receiveEngineSpeed (engineSpeed) &
+		 		all deltaVehicleSpeed, vehicleSpeed
+		 		(
+		 			not receiveVehicleSpeed (
+		 				deltaVehicleSpeed, vehicleSpeed
+		 			)
+		 		) &
+		 		engineSpeed <= 1500 &
+		 		storedDeltaVehicleSpeed <= 0 ->
+		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Down &
+		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
+		 	) &
+		 	(
+		 		all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
+		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
+		 		storedEngineSpeed <= 1500 &
+		 		deltaVehicleSpeed <= 0 ->
+		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Down &
+		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
+		 	) &
+		 	/* */
 		 	(
 		 		receiveEngineSpeed (engineSpeed) &
 		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
@@ -64,6 +117,32 @@ signature:
 				)
 			) &
 			(
+		 		receiveEngineSpeed (engineSpeed) &
+		 		all deltaVehicleSpeed, vehicleSpeed
+		 		(
+		 			not receiveVehicleSpeed (
+		 				deltaVehicleSpeed, vehicleSpeed
+		 			)
+		 		) &
+		 		engineSpeed <= 1500 &
+		 		storedDeltaVehicleSpeed >= 0 & storedVehicleSpeed > 0 ->
+				all gearShiftWidth1, gearShiftDirection1
+				(
+					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
+				)
+			) &
+			(
+		 		all engineSpeed (not receiveEngineSpeed (engineSpeed)) &	
+		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
+		 		storedEngineSpeed <= 1500 &
+		 		deltaVehicleSpeed >= 0 & vehicleSpeed > 0 ->
+				all gearShiftWidth1, gearShiftDirection1
+				(
+					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
+				)
+			) &
+			/* */
+			(
 				receiveEngineSpeed (engineSpeed) &
 				receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
 				engineSpeed >= 1500 &
@@ -72,8 +151,70 @@ signature:
 				(
 					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
 				)
+			) &
+			(
+				receiveEngineSpeed (engineSpeed) &
+				all deltaVehicleSpeed, vehicleSpeed
+		 		(
+		 			not receiveVehicleSpeed (
+		 				deltaVehicleSpeed, vehicleSpeed
+		 			)
+		 		) &
+				engineSpeed >= 1500 & engineSpeed < 3000 ->
+				all gearShiftWidth1, gearShiftDirection1
+				(
+					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
+				)
+			) &
+			(
+				all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
+				receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
+				storedEngineSpeed >= 1500 & storedEngineSpeed < 3000 ->
+				all gearShiftWidth1, gearShiftDirection1
+				(
+					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
+				)
+			) &
+			/* */
+			(
+				all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
+				all deltaVehicleSpeed, vehicleSpeed
+				(
+					not receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed)
+				) ->
+				all gearShiftWidth1, gearShiftDirection1
+				(
+					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
+				)
 			);
-					
+		
+		ReceivingEventAction:
+			all deltaVehicleSpeed1, vehicleSpeed1
+			(
+				receiveVehicleSpeed (deltaVehicleSpeed1, vehicleSpeed1) ->
+				Until
+				(
+					storedDeltaVehicleSpeed = deltaVehicleSpeed1 &
+					storedVehicleSpeed = vehicleSpeed1,
+					ex deltaVehicleSpeed2, vehicleSpeed2
+					(
+						receiveVehicleSpeed (deltaVehicleSpeed2, vehicleSpeed2)
+					)
+				)
+			) &
+			all engineSpeed1
+			(
+				receiveEngineSpeed (engineSpeed1) ->
+				Until
+				(
+					storedEngineSpeed = engineSpeed1,
+					ex engineSpeed2
+					(
+						receiveEngineSpeed (engineSpeed2)
+					)
+				)
+			);
+				
 		MutualExclusions:
 			all gearShiftWidth1, gearShiftDirection1
 			(
@@ -84,6 +225,25 @@ signature:
 					gearShiftDirection1 <> gearShiftDirection2 ->
 					not controlGearShift (gearShiftWidth2, gearShiftDirection2)
 				)
-			); 
-		 
+			) &
+			all engineSpeed1
+			(
+				receiveEngineSpeed (engineSpeed1) ->
+				all engineSpeed2
+				(
+					engineSpeed2 <> engineSpeed1 ->
+					not receiveEngineSpeed (engineSpeed2)
+				)
+			) &
+			all deltaVehicleSpeed1, vehicleSpeed1
+			(
+				receiveVehicleSpeed (deltaVehicleSpeed1, vehicleSpeed1) ->
+				all deltaVehicleSpeed2, vehicleSpeed2
+				(
+					deltaVehicleSpeed2 <> deltaVehicleSpeed1 &
+					vehicleSpeed2 <> vehicleSpeed1 ->
+					not receiveVehicleSpeed (deltaVehicleSpeed2, vehicleSpeed2)
+				)
+			);
+			
 end
