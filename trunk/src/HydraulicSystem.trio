@@ -1,8 +1,16 @@
-class HydraulicSystem (const fluidPropagationDelay) 
+class HydraulicSystem (
+	const fluidPropagationDelay
+) 
 
 signature: 
 
-	visible: gearHandle, gearShift, gearDrive, gearPark, gearReverse, controlGearShift;
+	visible:
+		gearHandle,
+		gearShift,
+		gearDrive,
+		gearPark,
+		gearReverse,
+		controlGearShift;
 
 	temporal domain: real;
 	
@@ -73,8 +81,10 @@ signature:
 					Futr (gearShift (gearShiftWidth, gearShiftDirection), t1)));
 		
 		MutualExclusions:
-			all gear (
+			all gear
+			(
 				gearHandle (gear) ->
-				all gear2 (gear <> gear2 -> not gearHandle (gear2)));
+				all gear2 (gear <> gear2 -> not gearHandle (gear2))
+			);
 
 end

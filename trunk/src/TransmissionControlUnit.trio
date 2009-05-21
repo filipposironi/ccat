@@ -49,7 +49,7 @@ signature:
 		 		receiveEngineSpeed (engineSpeed) &
 		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
 		 		engineSpeed <= 1500 &
-		 		deltaVehicleSpeed < 0 ->
+		 		deltaVehicleSpeed <= 0 ->
 		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Down &
 		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
 		 	) &
