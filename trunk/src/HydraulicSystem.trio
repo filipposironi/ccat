@@ -1,6 +1,8 @@
-class HydraulicSystem (
-	const fluidPropagationDelay
-) 
+class HydraulicSystem (const fluidPropagationDelay)
+/*
+ * Si assume che il ritardo di propagazione del fluido nel HS sia identico per
+ * qualsiasi configurazione delle valvole del HS stesso.
+ */
 
 signature: 
 
@@ -40,7 +42,11 @@ signature:
 		t2: real;
 		t3: real;
 	formulae:		
-		GearHandle: 
+		GearHandle:
+			/*
+			 * Questo assioma modella il ritardo introdotto dal HS quando il
+			 * pilota aziona la leva del cambio per selezionare le modalita'.
+			 */
 			(
 				gear = Drive & gearHandle (gear) ->
 				ex t1 (0 < t1 <= fluidPropagationDelay &
@@ -58,6 +64,11 @@ signature:
 			);
 		
 		GearHandleEvent:
+			/*
+			 * Questo assioma garantisce che quando viene azionata la leva
+			 * del cambio allora nell'arco di tempo necessario al HS per reagire
+			 * non ci siano nuovi azionamenti della leva del cambio.
+			 */
 			(
 				gearDrive ->
 				all t1 (0 <= t1 <= fluidPropagationDelay ->
@@ -75,12 +86,21 @@ signature:
 			);
 		
 		PropagateGearShiftCommand:
+			/*
+			 * Questo assioma si occupa di inoltrare al PGS i comandi ricevuti
+			 * dal TCU introducendo il ritardo dovuto alla propagazione del
+			 * fluido.
+			 */
 			all gearShiftWidth, gearShiftDirection (
 				controlGearShift (gearShiftWidth, gearShiftDirection) ->
 				ex t1 (0 < t1 <= fluidPropagationDelay &
 					Futr (gearShift (gearShiftWidth, gearShiftDirection), t1)));
 		
 		MutualExclusions:
+			/*
+			 * Questo assioma impone che la leva del cambio possa generare un
+			 * solo evento per ogni istante di tempo.
+			 */
 			all gear
 			(
 				gearHandle (gear) ->

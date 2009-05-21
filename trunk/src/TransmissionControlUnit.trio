@@ -37,15 +37,15 @@ signature:
 	 	gearShiftDirection1: ShiftDirection;
 	 	gearShiftDirection2: ShiftDirection;
 	 formulae:	 	 
-	 	/*
-		 * Considerando che la velocita' di funzionamento dell'elettronica e'
-		 * normalmente superiore alla velocita' di funzionamento della meccanica
-		 * ed ai tempi di reazione umani possiamo assumere che quando il
-		 * veicolo si ferma il tempo necessario per campionare la velocita'
-		 * e portare il veicolo in prima marcia e' inferiore al tempo necessario
-		 * all'utente per ripartire.
-		 */
 	 	GearShifts:
+	 		/*
+	 		 * Quando la velocita' rotazione dell'albero motore e' superiore a
+		 	 * 3000 RPM allora il TCU impone al sistema di inserire una marcia.
+ 		 	 *
+		 	 * NB: i sensori possono sollevare eventi in modo asincrono. In tal
+		 	 * caso il TCU utilizza i valori letti in precedenza dai sensori
+		 	 * che nello stesso istante non hanno sollevato un evento.
+	 		 */
 		 	(
 		 		receiveEngineSpeed (engineSpeed) &
 		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
@@ -75,7 +75,23 @@ signature:
 		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Up &
 		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
 		 	) &
-		 	/* */
+		 	/*
+		 	 * Quando la velocita' rotazione dell'albero motore e' inferiore a
+		 	 * 1500 RPM e la velocita' e' in diminuzione allora il TCU impone
+		 	 * al sistema di scalare una marcia.
+		 	 *
+		 	 * NB: quando il veicolo si ferma la velocita' di rotazione del
+		 	 * motore e' inferiore a 1500 RPM quindi il TCU impone di scalare
+		 	 * una marcia. Questa operazione viene ripetuta finche' il
+		 	 * veicolo e' fermo e possiamo assumere che tutte le marce vengano
+		 	 * scalate prima che il veicolo venga rimesso in moto in quanto
+		 	 * la velocita' di campionamento dell'elettronica e' diversi ordini
+		 	 * di grande superiore ai tempi di reazione umani.
+		 	 *
+		 	 * NB: i sensori possono sollevare eventi in modo asincrono. In tal
+		 	 * caso il TCU utilizza i valori letti in precedenza dai sensori
+		 	 * che nello stesso istante non hanno sollevato un evento.
+		 	 */
 		 	(
 		 		receiveEngineSpeed (engineSpeed) &
 		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
@@ -101,16 +117,24 @@ signature:
 		 		all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
 		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
 		 		storedEngineSpeed <= 1500 &
-		 		deltaVehicleSpeed <= 0 ->
+		 		(deltaVehicleSpeed <= 0 | vehicleSpeed = 0) ->
 		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Down &
 		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
 		 	) &
-		 	/* */
+		 	/*
+	 		 * Quando la velocita' rotazione dell'albero motore e' inferiore a
+		 	 * 1500 RPM ed la velocita' del veicolo e' in aumento allora il TCU
+		 	 * impone al sistema di non effettuare cambi marcia.
+		 	 *
+		 	 * NB: i sensori possono sollevare eventi in modo asincrono. In tal
+		 	 * caso il TCU utilizza i valori letti in precedenza dai sensori
+		 	 * che nello stesso istante non hanno sollevato un evento.
+	 		 */
 		 	(
 		 		receiveEngineSpeed (engineSpeed) &
 		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
 		 		engineSpeed <= 1500 &
-		 		deltaVehicleSpeed >= 0 & vehicleSpeed > 0 ->
+		 		deltaVehicleSpeed > 0 ->
 				all gearShiftWidth1, gearShiftDirection1
 				(
 					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
@@ -141,7 +165,15 @@ signature:
 					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
 				)
 			) &
-			/* */
+			/*
+	 		 * Quando la velocita' rotazione dell'albero motore e' compresa tra
+		 	 * 1500 RPM e 3000 RPM allora il TCU impone al sistema di non
+		 	 * effettuare cambi marcia.
+		 	 *
+		 	 * NB: i sensori possono sollevare eventi in modo asincrono. In tal
+		 	 * caso il TCU utilizza i valori letti in precedenza dai sensori
+		 	 * che nello stesso istante non hanno sollevato un evento.
+	 		 */
 			(
 				receiveEngineSpeed (engineSpeed) &
 				receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
@@ -175,7 +207,10 @@ signature:
 					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
 				)
 			) &
-			/* */
+			/*
+			 * Se il TCU non viene sollecitato da eventi sollevati dai sensori
+			 * allora il TCU impone al sistema di non effettuare cambi marcia. 
+			 */
 			(
 				all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
 				all deltaVehicleSpeed, vehicleSpeed
@@ -189,6 +224,14 @@ signature:
 			);
 		
 		ReceivingEventAction:
+			/*
+			 * Questo assioma permette di modellare il salvataggio dei valori
+			 * precedenti di velocita' di rotazione del motore, della velocita'
+			 * di marcia del veicolo e della differenza di velocita' di marcia.
+			 * Questi valori vengono aggiornati quando i sensori sollevano un
+			 * evento ed il valore non cambia finche' i sensori non sollevano
+			 * un nuovo evento.
+			 */
 			all deltaVehicleSpeed1, vehicleSpeed1
 			(
 				receiveVehicleSpeed (deltaVehicleSpeed1, vehicleSpeed1) ->
@@ -216,6 +259,10 @@ signature:
 			);
 				
 		MutualExclusions:
+			/*
+			 * Il TCU non invia nello stesso istante due comandi di cambio
+			 * marcia.
+			 */
 			all gearShiftWidth1, gearShiftDirection1
 			(
 				controlGearShift (gearShiftWidth1, gearShiftDirection1) ->
@@ -226,6 +273,10 @@ signature:
 					not controlGearShift (gearShiftWidth2, gearShiftDirection2)
 				)
 			) &
+			/*
+			 * Il TCU riceve un solo evento da ogni sensore in un istante di
+			 * tempo.
+			 */
 			all engineSpeed1
 			(
 				receiveEngineSpeed (engineSpeed1) ->
