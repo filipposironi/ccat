@@ -1,7 +1,4 @@
-class VehicleSpeedSensor (
-	const sampleInterval,
-	const sampleDelay
-)
+class VehicleSpeedSensor (const sampleInterval, const sampleDelay)
 
 signature: 
 
@@ -23,9 +20,9 @@ signature:
 		
 	axioms:
 		/*
-		 * Supponiamo che ad ogni evento di campionamento la variabile di stato
-		 * actualValue venga automaticamente aggiornata con il nuovo valore
-		 * della velocita' attuale.
+		 * We suppose that every time a sampleSpeed event accures the state
+		 * variable actualSpeed - which is time dependent and total - is
+		 * automatically updated with the actual vehicle speed.
 		 */
 	vars:
 		t: real;
@@ -37,16 +34,19 @@ signature:
 			storedSpeed >= 0;
 		
 		/*
-		 * In passato e' stato effettuato il primo campionamento. Questo assioma
-		 * permette di "avviare" la serie di campionamenti a frequenza costante.
-		 *
-		 * NB: e' la condizione iniziale del sensore.
+		 * This axiom says that sometimes in the past the storedSpeed state
+		 * variablethere was equal to 0 and there was also a sampleSpeed event
+		 * accurance. This can be consider just like the initial condition of
+		 * our sensor and thanks to that we can manage to start the whole
+		 * sampling.
 		 */
 		BeginSample:
-			SomP (sampleSpeed);
+			SomP (storedSpeed = 0 & sampleSpeed);
 		
 		/*
-		 * Definizione di campionamento a frequenza costante.
+		 * This axiom define how the constant frequence sampling works.
+		 * Moreoever, this axiom guarantees that there won't be a sampleSpeed
+		 * event accurance between two adjacent sampleSpeed event accurances.
 		 */
 		SamplingDefinition:
 			sampleSpeed ->
