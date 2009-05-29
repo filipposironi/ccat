@@ -2,65 +2,34 @@ class EngineSpeedSensor (const sampleInterval, const sampleDelay)
 
 signature: 
 
-	visible: actualSpeed, sendSpeed;
+visible: actualSpeed, sendSpeed;
 
-	temporal domain: real;
+temporal domain: real;
 
-	items:
-		TD total actualSpeed: integer;
-		event sendSpeed (integer);
-		event sampleSpeed;
-		/*
-		 * TI sampleInterval: real;
-		 * TI sampleDelay: real;
-		 */
+items:
+	TI sampleInterval: real;
+	TI sampleDelay: real;
+	TD total actualSpeed: integer;
+	event sendSpeed (integer);
+	event sampleSpeed;
 	
-	axioms:
-		/*
-		 * Supponiamo che ad ogni evento di campionamento la variabile di stato
-		 * actualValue venga automaticamente aggiornata con il nuovo valore
-		 * della velocita' attuale.
-		 */
-	vars:
-		t: real;
-		speed: integer;
-	formulae:
-		SpeedValues:
-			actualSpeed >= 0;
+axioms:
+vars:
+	speed: integer;
+formulae:
+	SpeedValues:
+		actualSpeed >= 0;
 		
-		/*
-		 * In passato e' stato effettuato il primo campionamento. Questo assioma
-		 * permette di "avviare" la serie di campionamenti a frequenza costante.
-		 *
-		 * NB: e' la condizione iniziale del sensore.
-		 */
-		BeginSample:
-			SomP (sampleSpeed);
+	BeginSample:
+		SomP (sampleSpeed);
 		
-		/*
-		 * Definizione di campionamento a frequenza costante.
-		 */
-		SamplingDefinition:
-			sampleSpeed ->
-				Futr (sampleSpeed, sampleInterval) &
-				all t (0 < t < sampleInterval -> Futr (not sampleSpeed, t));
+	SamplingDefinition:
+		sampleSpeed implies	Futr (sampleSpeed, sampleInterval) and not Lasts (sampleSpeed, sampleInterval);
 		
-		/*
-		 * Questo assioma descrive le azioni che il sensore compie ad ogni
-		 * campionamento. Per ogni campionamento il sensore solleva un evento
-		 * per inviare i valori letti al TCU ed effettua questa operazione con
-		 * ritardo costante.
-		 */
-		SampleSpeedActions:
-			sampleSpeed ->
-				Futr (actualSpeed = speed & sendSpeed (speed), sampleDelay);
+	SampleSpeedActions:
+		sampleSpeed implies Futr (actualSpeed = speed and sendSpeed (speed), sampleDelay);
 		
-		/*
-		 * Questo assioma garantisce che ad ogni eventi di sendSpeed corrisponda
-		 * un evento di campionamento passato.
-		 */
-		SendSpeed:
-			actualSpeed = speed & sendSpeed (speed) ->
-				Past (sampleSpeed, sampleDelay);
+	SendSpeed:
+		actualSpeed = speed and sendSpeed (speed) implies Past (sampleSpeed, sampleDelay);
 								
 end

@@ -2,84 +2,38 @@ class VehicleSpeedSensor (const sampleInterval, const sampleDelay)
 
 signature: 
 
-	visible:
-		actualSpeed,
-		sendSpeed;
+visible:
+	actualSpeed,
+	sendSpeed;
 
-	temporal domain: real;
+temporal domain: real;
 
-	items:
-		TD total storedSpeed: integer;
-		TD total actualSpeed: integer;
-		event sendSpeed (integer, integer);
-		event sampleSpeed;
-		/*
-		 * TI sampleInterval: real;
-		 * TI sampleDelay: real;
-		 */
+items:
+	TI sampleInterval: real;
+	TI sampleDelay: real;
+	TD total storedSpeed: integer;
+	TD total actualSpeed: integer;
+	event sendSpeed (integer, integer);
+	event sampleSpeed;
+	
+axioms:
+vars:
+	deltaSpeed: integer;
+	speed: integer;
+formulae:
+	SpeedValues:
+		actualSpeed >= 0 and storedSpeed >= 0;
+
+	BeginSample:
+		SomP (storedSpeed = 0 & sampleSpeed);
+	
+	SamplingDefinition:
+		sampleSpeed implies	Futr (sampleSpeed, sampleInterval) and not Lasts (sampleSpeed, sampleInterval);
 		
-	axioms:
-		/*
-		 * We suppose that every time a sampleSpeed event accures the state
-		 * variable actualSpeed - which is time dependent and total - is
-		 * automatically updated with the actual vehicle speed.
-		 */
-	vars:
-		t: real;
-		deltaSpeed: integer;
-		speed: integer;
-	formulae:
-		SpeedValues:
-			actualSpeed >= 0 &
-			storedSpeed >= 0;
-		
-		/*
-		 * This axiom says that sometimes in the past the storedSpeed state
-		 * variablethere was equal to 0 and there was also a sampleSpeed event
-		 * accurance. This can be consider just like the initial condition of
-		 * our sensor and thanks to that we can manage to start the whole
-		 * sampling.
-		 */
-		BeginSample:
-			SomP (storedSpeed = 0 & sampleSpeed);
-		
-		/*
-		 * This axiom define how the constant frequence sampling works.
-		 * Moreoever, this axiom guarantees that there won't be a sampleSpeed
-		 * event accurance between two adjacent sampleSpeed event accurances.
-		 */
-		SamplingDefinition:
-			sampleSpeed ->
-			Futr (sampleSpeed, sampleInterval) &
-			all t (0 < t < sampleInterval -> Futr (not sampleSpeed, t));
+	SamplingAction:
+		sampleSpeed implies	Futr (deltaSpeed = actualSpeed - storedSpeed and speed = actualSpeed and sendSpeed (deltaSpeed, speed) and Lasts (storedSpeed = actualSpeed, sampleInterval), sampleDelay);
 			
-		/*
-		 * Questo assioma descrive le azioni che il sensore compie ad ogni
-		 * campionamento. Per ogni campionamento il sensore solleva un evento
-		 * per inviare i valori letti al TCU ed effettua questa operazione con
-		 * ritardo costante.
-		 *
-		 * NB: questo assioma modella il salvataggio del valore attuale della
-		 * velocita' in una memoria ed impone che tale uguaglianza sia vera
-		 * fino al successivo campionamento.
-		 */
-		SamplingAction:
-			sampleSpeed ->
-			Futr
-			(
-				deltaSpeed = actualSpeed - storedSpeed & speed = actualSpeed &
-				sendSpeed (deltaSpeed, speed) &
-				Lasts (storedSpeed = actualSpeed, sampleInterval),
-				sampleDelay
-			);
-			
-		/*
-		 * Questo assioma garantisce che ad ogni eventi di sendSpeed corrisponda
-		 * un evento di campionamento passato.
-		 */
-		SendSpeed:
-			deltaSpeed = actualSpeed - storedSpeed & actualSpeed = speed &
-			sendSpeed (deltaSpeed, speed) ->
-			Past (sampleSpeed, -sampleDelay);
+	SendSpeed:
+		deltaSpeed = actualSpeed - storedSpeed and actualSpeed = speed and sendSpeed (deltaSpeed, speed) implies Past (sampleSpeed, -sampleDelay);
 
 end
