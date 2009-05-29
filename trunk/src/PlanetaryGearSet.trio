@@ -39,6 +39,9 @@ vars:
 	gearShiftDirection2: ShiftDirection;
 	gear: Gear;
 formulae:
+	Annotations:
+		actualGear = Park implies transmissionShaftState = Detached;
+		
 	GearDriveShift:
 		(actualGear = Reverse and gearDrive implies	(Lasts (actualGear = Reverse, driveGearShiftDelay) and Futr (actualGear = First, driveGearShiftDelay))) and
 		(actualGear = Park and gearDrive implies (Lasts (actualGear = Park, driveGearShiftDelay) and Futr (actualGear = First, driveGearShiftDelay))) and
@@ -71,8 +74,7 @@ formulae:
 		(actualGear = Park implies SomF (gearDrive or gearReverse)) and
 		(actualGear = First and gearPark implies Lasts (actualGear = First, parkGearShiftDelay) and Futr (actualGear = Park, parkGearShiftDelay)) and
 		(actualGear = Reverse and gearPark implies Lasts (actualGear = Reverse, parkGearShiftDelay) and Futr (actualGear = Park, parkGearShiftDelay)Futr (actualGear = Park, parkGearShiftDelay)) and
-		(gearPark iff transmissionShaftState = Detached);
-		
+		(gearPark iff transmissionShaftState = Detached);		
 	GearShiftsTimings:
 		all gearShiftDirection ((actualGear = First or actualGear = Second or actualGear = Third) and gearShiftWidth = 1 and gearShift (gearShiftWidth, gearShiftDirection) implies not Lasts (gearDrive or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (gearShift (gearShiftWidth2, gearShiftDirection2)), singleGearShiftDelay)) and
 		all gearShiftDirection ((actualGear = First or actualGear = Third) and gearShiftWidth = 2 and gearShift (gearShiftWidth, gearShiftDirection) implies not Lasts (gearDrive or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (gearShift (gearShiftWidth2, gearShiftDirection2)), dualGearShiftDelay)) and
