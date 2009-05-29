@@ -36,7 +36,7 @@ morekeywords=[0]{class,signature,visible,temporal,domain,domains,items,axioms,va
 keywordstyle=[0]\color{violet}\bfseries,
 morekeywords=[1]{state,event,const,TD,total,TI,direct},
 keywordstyle=[1]\color{violet},
-morekeywords=[2]{Dist,Past,Futr,Lasted,Lasts,WithinP,WithinF,Som,SomP,SomF,Alw,AlwP,AlwF,UpToNow,NowOn},
+morekeywords=[2]{Dist,Past,Futr,Lasted,Lasts,WithinP,WithinF,Som,SomP,SomF,Alw,AlwP,AlwF,UpToNow,NowOn,Until,Since},
 keywordstyle=[2]\color{blue},
 morekeywords=[3]{integer,real},
 keywordstyle=[3]\color{green},
@@ -58,7 +58,7 @@ sensitive
 \end{center}
 \vskip 9cm
 \begin{center}
-{\Large Computer Controller Automatic Transmission}
+{\Large Computer Controller Automatic Transmission\\(Mandatory Part)}
 \end{center}
 \vskip 2cm
 \begin{center}
@@ -85,60 +85,12 @@ sensitive
 \newpage
 \lstlistoflistings
 
-\newpage
-\section{Big Picture}
-\label{Section:Structure}
-Figure~\ref{Figure:CCAT} shows the \emph{big picture} of the \emph{Computer Controlled Automatic Transmission} we designed.
-
-\thispagestyle{empty}
-\begin{figure}[!p]
-\vspace{-3 cm}
-\centerline{\includegraphics[scale=0.8,angle=-90]{images/CCAT.pdf}}
-\caption{Computer Controller Automatic Transmission}
-\label{Figure:CCAT}
-\end{figure}
-
-\newpage
-\section{Vehicle/EngineSpeedSensor Classes}
-\label{Section:SpeedSensors}
-The \emph{VehicleSpeedSensor} is formalized thanks to the code reported in Listing~\ref{Code:VehicleSpeedSensor} while the \emph{EngineSpeedSensor} is formalized thanks to the code reported in Listing~\ref{Code:EngineSpeedSensor}.
-
-During the formalization of sensors we decided to simplify the design assuming that every time a \texttt{sampleSpeed} event occurs the state variable \texttt{actualSpeed} - which is \texttt{time dependent} and \texttt{total} - is automatically updated with the actual measured speed. This means we don't provide any axioms formalizing this behavior.
-
-Moreover, we specified the starting point of the constant frequency sample chain saying that sometimes in the past there was a \texttt{sampleSpeed} occurrence. Further more, we guarante that \texttt{sampleSpeed} events will accure at constant frequency. In addition, if the sensor has memory we imposed that the \texttt{storedValue} is equal to 0. These can be consider just like the ``initial conditions'' of the system.
-
-At the end, we guaranteed a sensor performs the needed action if and only if a sample event occur.
-
-We didn't write any axioms specifying the fact that a \texttt{sendSpeed} event is mutually exclusive with itself due to the \texttt{total time dependent} parameter it accepts.
-
-\lstinputlisting[language=TRIO,tabsize=4,numbers=left,numberstyle=\small,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=VehicleSpeedSensor.trio,label=Code:VehicleSpeedSensor]{../src/VehicleSpeedSensor.trio}
-
-\lstinputlisting[language=TRIO,tabsize=4,numbers=left,numberstyle=\small,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=EngineSpeedSensor.trio,label=Code:EngineSpeedSensor]{../src/EngineSpeedSensor.trio}
-
-\newpage
-\section{PlanetaryGearSet Class}
-\label{Section:PlanetaryGearSet}
-The \emph{PlanetaryGearSet} class is formalized thanks to the code reported in Listing~\ref{Code:PlanetaryGearSet}.
-
-The Planetary Gear Set guarantees that every time a gear shift event occurs the \texttt{actualGear} will be maintained until the shift is finished.
-
-Inside this component are defined all axioms limiting gear shifts to effective ones only (e.g. it is impossibile to shift down a gear if \texttt{actualGear} is \texttt{First}.
-
-Moreover, through the formalization of the Planetary Gear Set we impose that we can't receive a gear shift event if we are in the middle of a gear shift. Different gear shifting times are defined for different gears and different steps.
-
-The gears \texttt{Drive}, \texttt{Park}, and \texttt{Reverse} can be selected if and only if the transmission shaft is decoupled from the engine.
-
-The state of the Planetary Gear Set changes if and only if an event occurs.
-
-\lstinputlisting[language=TRIO,tabsize=4,numbers=left,numberstyle=\small,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=PlanetaryGearSet.trio,label=Code:PlanetaryGearSet]{../src/PlanetaryGearSet.trio}
-
-\newpage
-\section{HydraulicSystem Class}
-\label{Section:HydraulicSystem}
-
-\newpage
-\section{TransmissionControlUnit Class}
-\label{Section:TransmissionControlUnit}
+\newpage\input{sections/ccat.tex}
+\newpage\input{sections/ss.tex}
+\newpage\input{sections/pgs.tex}
+\newpage\input{sections/hs.tex}
+\newpage\input{sections/tcu.tex}
+\newpage\input{sections/annotations.tex}
 
 %\bibliographystyle{settings/IEEEtran}
 \bibliographystyle{unsrt}
