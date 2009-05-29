@@ -34,6 +34,6 @@ formulae:
 		sampleSpeed implies	Futr (deltaSpeed = actualSpeed - storedSpeed and speed = actualSpeed and sendSpeed (deltaSpeed, speed) and Lasts (storedSpeed = actualSpeed, sampleInterval), sampleDelay);
 			
 	SendSpeed:
-		deltaSpeed = actualSpeed - storedSpeed and actualSpeed = speed and sendSpeed (deltaSpeed, speed) implies Past (sampleSpeed, -sampleDelay);
+		deltaSpeed = actualSpeed - storedSpeed and actualSpeed = speed and sendSpeed (deltaSpeed, speed) implies Past (sampleSpeed, sampleDelay);
 
 end
