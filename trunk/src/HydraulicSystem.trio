@@ -31,20 +31,17 @@ vars:
 	gear: GearPosition;
 	gear2: GearPosition;
 	gearShiftWidth: ShiftWidth;
+	gearShiftWidth2: ShiftWidth;
 	gearShiftDirection: ShiftDirection;
+	gearShiftDirection2: ShiftDirection;
 formulae:		
-	GearHandle:
-		(gear = Drive and gearHandle (gear) implies Futr (gearDrive, fluidPropagationDelay) and
-		(gear = Park and gearHandle (gear) implies Futr (gearPark, fluidPropagationDelay) and
-		(gear = Reverse and gearHandle (gear) implies Futr (gearReverse, fluidPropagationDelay);
-		
-	GearHandleEvent:
-		(gearDrive implies not Lasts (gearReverse or gearPark, fluidPropagationDelay)) and
-		(gearReverse implies not Lasts (gearDrive or gearPark, fluidPropagationDelay)) and
-		(gearPark implies not Lasts (gearReverse or gearDrive, fluidPropagationDelay));
+	GearHandleCommand:
+		(gear = Drive and gearHandle (gear) implies not Lasts (all gear2 (gear2 <> gear implies gearHandle (gear2) or ex gearShiftWidth, gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection))), fluidPropagationDelay) and Futr (gearDrive, fluidPropagationDelay) and
+		(gear = Park and gearHandle (gear) implies not Lasts (all gear2 (gear2 <> gear implies gearHandle (gear2) or ex gearShiftWidth, gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection))), fluidPropagationDelay) and Futr (gearPark, fluidPropagationDelay) and
+		(gear = Reverse and gearHandle (gear) implies not Lasts (all gear2 (gear2 <> gear implies gearHandle (gear2) or ex gearShiftWidth, gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection))), fluidPropagationDelay) and Futr (gearReverse, fluidPropagationDelay);
 		
 	PropagateGearShiftCommand:
-		all gearShiftWidth, gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection) implies Futr (gearShift (gearShiftWidth, gearShiftDirection), fluidPropagationDelay);
+		all gearShiftWidth, gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection) implies not Lasts (gearDrive or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (controlGearShift (gearShiftWidth2, gearShiftDirection2)), fluidPropagationDelay) and Futr (gearShift (gearShiftWidth, gearShiftDirection), fluidPropagationDelay));
 	
 	MutualExclusions:
 		all gear (gearHandle (gear) implies all gear2 (gear <> gear2 implies not gearHandle (gear2)));
