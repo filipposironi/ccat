@@ -1,110 +1,52 @@
 class HydraulicSystem (const fluidPropagationDelay)
-/*
- * Si assume che il ritardo di propagazione del fluido nel HS sia identico per
- * qualsiasi configurazione delle valvole del HS stesso.
- */
 
 signature: 
 
-	visible:
-		gearHandle,
-		gearShift,
-		gearDrive,
-		gearPark,
-		gearReverse,
-		controlGearShift;
+visible:
+	gearHandle,
+	gearShift,
+	gearDrive,
+	gearPark,
+	gearReverse,
+	controlGearShift;
 
-	temporal domain: real;
+temporal domain: real;
 	
-	domains:
-		GearPosition: {Drive, Park, Reverse};
-		ShiftWidth: 1..2;
-		ShiftDirection: {Up, Down};
+domains:
+	GearPosition: {Drive, Park, Reverse};
+	ShiftWidth: 1..2;
+	ShiftDirection: {Up, Down};
 
-	items: 
-		event gearHandle (GearPosition);
-		event gearShift (ShiftWidth, ShiftDirection);
-		event gearDrive;
-		event gearPark;
-		event gearReverse;
-		event controlGearShift (ShiftWidth, ShiftDirection);
-		/*
-		 * TI fluidPropagationDelay: real;
-		 */
+items: 
+	TI fluidPropagationDelay: real;
+	event gearHandle (GearPosition);
+	event gearShift (ShiftWidth, ShiftDirection);
+	event gearDrive;
+	event gearPark;
+	event gearReverse;
+	event controlGearShift (ShiftWidth, ShiftDirection);
 		
-	axioms:
-	vars:
-		gear: GearPosition;
-		gear2: GearPosition;
-		gearShiftWidth: ShiftWidth;
-		gearShiftDirection: ShiftDirection;
-		t1: real;
-		t2: real;
-		t3: real;
-	formulae:		
-		GearHandle:
-			/*
-			 * Questo assioma modella il ritardo introdotto dal HS quando il
-			 * pilota aziona la leva del cambio per selezionare le modalita'.
-			 */
-			(
-				gear = Drive & gearHandle (gear) ->
-				ex t1 (0 < t1 <= fluidPropagationDelay &
-					Futr (gearDrive, t1))
-			) &
-			(
-				gear = Park & gearHandle (gear) ->
-				ex t2 (0 < t2 <= fluidPropagationDelay &
-					Futr (gearPark, t2))
-			) &
-			(
-				gear = Reverse & gearHandle (gear) ->
-				ex t3 (0 < t3 <= fluidPropagationDelay &
-					Futr (gearReverse, t3))
-			);
+axioms:
+vars:
+	gear: GearPosition;
+	gear2: GearPosition;
+	gearShiftWidth: ShiftWidth;
+	gearShiftDirection: ShiftDirection;
+formulae:		
+	GearHandle:
+		(gear = Drive and gearHandle (gear) implies Futr (gearDrive, fluidPropagationDelay) and
+		(gear = Park and gearHandle (gear) implies Futr (gearPark, fluidPropagationDelay) and
+		(gear = Reverse and gearHandle (gear) implies Futr (gearReverse, fluidPropagationDelay);
 		
-		GearHandleEvent:
-			/*
-			 * Questo assioma garantisce che quando viene azionata la leva
-			 * del cambio allora nell'arco di tempo necessario al HS per reagire
-			 * non ci siano nuovi azionamenti della leva del cambio.
-			 */
-			(
-				gearDrive ->
-				all t1 (0 <= t1 <= fluidPropagationDelay ->
-					not Futr (gearReverse | gearPark, t1))
-			) &
-			(
-				gearReverse ->
-				all t2 (0 <= t2 <= fluidPropagationDelay ->
-					not Futr (gearDrive | gearPark, t2))
-			) &
-			(
-				gearPark ->
-				all t3 (0 <= t3 <= fluidPropagationDelay ->
-					not Futr (gearReverse | gearDrive, t3))
-			);
+	GearHandleEvent:
+		(gearDrive implies not Lasts (gearReverse or gearPark, fluidPropagationDelay)) and
+		(gearReverse implies not Lasts (gearDrive or gearPark, fluidPropagationDelay)) and
+		(gearPark implies not Lasts (gearReverse or gearDrive, fluidPropagationDelay));
 		
-		PropagateGearShiftCommand:
-			/*
-			 * Questo assioma si occupa di inoltrare al PGS i comandi ricevuti
-			 * dal TCU introducendo il ritardo dovuto alla propagazione del
-			 * fluido.
-			 */
-			all gearShiftWidth, gearShiftDirection (
-				controlGearShift (gearShiftWidth, gearShiftDirection) ->
-				ex t1 (0 < t1 <= fluidPropagationDelay &
-					Futr (gearShift (gearShiftWidth, gearShiftDirection), t1)));
-		
-		MutualExclusions:
-			/*
-			 * Questo assioma impone che la leva del cambio possa generare un
-			 * solo evento per ogni istante di tempo.
-			 */
-			all gear
-			(
-				gearHandle (gear) ->
-				all gear2 (gear <> gear2 -> not gearHandle (gear2))
-			);
+	PropagateGearShiftCommand:
+		all gearShiftWidth, gearShiftDirection (controlGearShift (gearShiftWidth, gearShiftDirection) implies Futr (gearShift (gearShiftWidth, gearShiftDirection), fluidPropagationDelay);
+	
+	MutualExclusions:
+		all gear (gearHandle (gear) implies all gear2 (gear <> gear2 implies not gearHandle (gear2)));
 
 end

@@ -2,299 +2,63 @@ class TransmissionControlUnit
 
 signature: 
 
-	visible:
-		controlGearShift,
-		receiveEngineSpeed,
-		receiveVehicleSpeed;
+visible:
+	controlGearShift,
+	receiveEngineSpeed,
+	receiveVehicleSpeed;
 
-	temporal domain: real;
+temporal domain: real;
 	
-	domains:
-		ShiftWidth: 1..2;
-		ShiftDirection: {Up, Down};
+domains:
+	ShiftWidth: 1..2;
+	ShiftDirection: {Up, Down};
 
-	items: 
-		event controlGearShift (ShiftWidth, ShiftDirection);
-		event receiveEngineSpeed (integer);
-		event receiveVehicleSpeed (integer, integer);
-		TD total storedEngineSpeed: integer;
-		TD total storedDeltaVehicleSpeed: integer;
-		TD total storedVehicleSpeed: integer;
+items:
+	TD total storedEngineSpeed: integer;
+	TD total storedDeltaVehicleSpeed: integer;
+	TD total storedVehicleSpeed: integer;
+	event controlGearShift (ShiftWidth, ShiftDirection);
+	event receiveEngineSpeed (integer);
+	event receiveVehicleSpeed (integer, integer);
 		
-	 axioms:
-	 vars:
-	 	engineSpeed: integer;
-	 	engineSpeed1: integer;
-	 	engineSpeed2: integer;
-	 	deltaVehicleSpeed: integer;
-	 	deltaVehicleSpeed1: integer;
-	 	deltaVehicleSpeed2: integer;
-	 	vehicleSpeed: integer;
-	 	vehicleSpeed1: integer;
-	 	vehicleSpeed2: integer;
-	 	gearShiftWidth1: ShiftWidth;
-	 	gearShiftWidth2: ShiftWidth;
-	 	gearShiftDirection1: ShiftDirection;
-	 	gearShiftDirection2: ShiftDirection;
-	 formulae:	 	 
-	 	GearShifts:
-	 		/*
-	 		 * Quando la velocita' rotazione dell'albero motore e' superiore a
-		 	 * 3000 RPM allora il TCU impone al sistema di inserire una marcia.
- 		 	 *
-		 	 * NB: i sensori possono sollevare eventi in modo asincrono. In tal
-		 	 * caso il TCU utilizza i valori letti in precedenza dai sensori
-		 	 * che nello stesso istante non hanno sollevato un evento.
-	 		 */
-		 	(
-		 		receiveEngineSpeed (engineSpeed) &
-		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
-		 		engineSpeed >= 3000 &
-		 		vehicleSpeed > 0 ->
-		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Up &
-		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
-		 	) &
-		 	(
-		 		receiveEngineSpeed (engineSpeed) &
-		 		all deltaVehicleSpeed, vehicleSpeed
-		 		(
-		 			not receiveVehicleSpeed (
-		 				deltaVehicleSpeed, vehicleSpeed
-		 			)
-		 		) &
-		 		engineSpeed >= 3000 &
-		 		storedVehicleSpeed > 0 ->
-		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Up &
-		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
-		 	) &
-		 	(
-		 		all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
-		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
-		 		storedEngineSpeed >= 3000 &
-		 		vehicleSpeed > 0 ->
-		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Up &
-		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
-		 	) &
-		 	/*
-		 	 * Quando la velocita' rotazione dell'albero motore e' inferiore a
-		 	 * 1500 RPM e la velocita' e' in diminuzione allora il TCU impone
-		 	 * al sistema di scalare una marcia.
-		 	 *
-		 	 * NB: quando il veicolo si ferma la velocita' di rotazione del
-		 	 * motore e' inferiore a 1500 RPM quindi il TCU impone di scalare
-		 	 * una marcia. Questa operazione viene ripetuta finche' il
-		 	 * veicolo e' fermo e possiamo assumere che tutte le marce vengano
-		 	 * scalate prima che il veicolo venga rimesso in moto in quanto
-		 	 * la velocita' di campionamento dell'elettronica e' diversi ordini
-		 	 * di grande superiore ai tempi di reazione umani.
-		 	 *
-		 	 * NB: i sensori possono sollevare eventi in modo asincrono. In tal
-		 	 * caso il TCU utilizza i valori letti in precedenza dai sensori
-		 	 * che nello stesso istante non hanno sollevato un evento.
-		 	 */
-		 	(
-		 		receiveEngineSpeed (engineSpeed) &
-		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
-		 		engineSpeed <= 1500 &
-		 		deltaVehicleSpeed <= 0 ->
-		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Down &
-		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
-		 	) &
-		 	(
-		 		receiveEngineSpeed (engineSpeed) &
-		 		all deltaVehicleSpeed, vehicleSpeed
-		 		(
-		 			not receiveVehicleSpeed (
-		 				deltaVehicleSpeed, vehicleSpeed
-		 			)
-		 		) &
-		 		engineSpeed <= 1500 &
-		 		storedDeltaVehicleSpeed <= 0 ->
-		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Down &
-		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
-		 	) &
-		 	(
-		 		all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
-		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
-		 		storedEngineSpeed <= 1500 &
-		 		(deltaVehicleSpeed <= 0 | vehicleSpeed = 0) ->
-		 		gearShiftWidth1 = 1 & gearShiftDirection1 = Down &
-		 		controlGearShift (gearShiftWidth1, gearShiftDirection1)
-		 	) &
-		 	/*
-	 		 * Quando la velocita' rotazione dell'albero motore e' inferiore a
-		 	 * 1500 RPM ed la velocita' del veicolo e' in aumento allora il TCU
-		 	 * impone al sistema di non effettuare cambi marcia.
-		 	 *
-		 	 * NB: i sensori possono sollevare eventi in modo asincrono. In tal
-		 	 * caso il TCU utilizza i valori letti in precedenza dai sensori
-		 	 * che nello stesso istante non hanno sollevato un evento.
-	 		 */
-		 	(
-		 		receiveEngineSpeed (engineSpeed) &
-		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
-		 		engineSpeed <= 1500 &
-		 		deltaVehicleSpeed > 0 ->
-				all gearShiftWidth1, gearShiftDirection1
-				(
-					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
-				)
-			) &
-			(
-		 		receiveEngineSpeed (engineSpeed) &
-		 		all deltaVehicleSpeed, vehicleSpeed
-		 		(
-		 			not receiveVehicleSpeed (
-		 				deltaVehicleSpeed, vehicleSpeed
-		 			)
-		 		) &
-		 		engineSpeed <= 1500 &
-		 		storedDeltaVehicleSpeed >= 0 & storedVehicleSpeed > 0 ->
-				all gearShiftWidth1, gearShiftDirection1
-				(
-					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
-				)
-			) &
-			(
-		 		all engineSpeed (not receiveEngineSpeed (engineSpeed)) &	
-		 		receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
-		 		storedEngineSpeed <= 1500 &
-		 		deltaVehicleSpeed >= 0 & vehicleSpeed > 0 ->
-				all gearShiftWidth1, gearShiftDirection1
-				(
-					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
-				)
-			) &
-			/*
-	 		 * Quando la velocita' rotazione dell'albero motore e' compresa tra
-		 	 * 1500 RPM e 3000 RPM allora il TCU impone al sistema di non
-		 	 * effettuare cambi marcia.
-		 	 *
-		 	 * NB: i sensori possono sollevare eventi in modo asincrono. In tal
-		 	 * caso il TCU utilizza i valori letti in precedenza dai sensori
-		 	 * che nello stesso istante non hanno sollevato un evento.
-	 		 */
-			(
-				receiveEngineSpeed (engineSpeed) &
-				receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
-				engineSpeed >= 1500 &
-				engineSpeed < 3000 ->
-				all gearShiftWidth1, gearShiftDirection1
-				(
-					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
-				)
-			) &
-			(
-				receiveEngineSpeed (engineSpeed) &
-				all deltaVehicleSpeed, vehicleSpeed
-		 		(
-		 			not receiveVehicleSpeed (
-		 				deltaVehicleSpeed, vehicleSpeed
-		 			)
-		 		) &
-				engineSpeed >= 1500 & engineSpeed < 3000 ->
-				all gearShiftWidth1, gearShiftDirection1
-				(
-					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
-				)
-			) &
-			(
-				all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
-				receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) &
-				storedEngineSpeed >= 1500 & storedEngineSpeed < 3000 ->
-				all gearShiftWidth1, gearShiftDirection1
-				(
-					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
-				)
-			) &
-			/*
-			 * Se il TCU non viene sollecitato da eventi sollevati dai sensori
-			 * allora il TCU impone al sistema di non effettuare cambi marcia. 
-			 */
-			(
-				all engineSpeed (not receiveEngineSpeed (engineSpeed)) &
-				all deltaVehicleSpeed, vehicleSpeed
-				(
-					not receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed)
-				) ->
-				all gearShiftWidth1, gearShiftDirection1
-				(
-					not controlGearShift (gearShiftWidth1, gearShiftDirection1)
-				)
-			);
+axioms:
+vars:
+	engineSpeed: integer;
+ 	engineSpeed1: integer;
+ 	engineSpeed2: integer;
+ 	deltaVehicleSpeed: integer;
+ 	deltaVehicleSpeed1: integer;
+ 	deltaVehicleSpeed2: integer;
+ 	vehicleSpeed: integer;
+ 	vehicleSpeed1: integer;
+ 	vehicleSpeed2: integer;
+ 	gearShiftWidth1: ShiftWidth;
+ 	gearShiftWidth2: ShiftWidth;
+ 	gearShiftDirection1: ShiftDirection;
+ 	gearShiftDirection2: ShiftDirection;
+formulae:
+	GearShifts:
+	 	(receiveEngineSpeed (engineSpeed) and receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) and engineSpeed >= 3000 and vehicleSpeed > 0 implies gearShiftWidth1 = 1 and gearShiftDirection1 = Up and controlGearShift (gearShiftWidth1, gearShiftDirection1)) and
+	 	(receiveEngineSpeed (engineSpeed) and all deltaVehicleSpeed, vehicleSpeed (not receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed)) and engineSpeed >= 3000 and storedVehicleSpeed > 0 implies gearShiftWidth1 = 1 and gearShiftDirection1 = Up and controlGearShift (gearShiftWidth1, gearShiftDirection1)) and
+	 	(all engineSpeed (not receiveEngineSpeed (engineSpeed)) and	receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) and storedEngineSpeed >= 3000 and vehicleSpeed > 0 implies gearShiftWidth1 = 1 and gearShiftDirection1 = Up and controlGearShift (gearShiftWidth1, gearShiftDirection1)) and
+		(receiveEngineSpeed (engineSpeed) and receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) and engineSpeed <= 1500 and deltaVehicleSpeed <= 0 implies gearShiftWidth1 = 1 and gearShiftDirection1 = Down and controlGearShift (gearShiftWidth1, gearShiftDirection1)) and
+	 	(receiveEngineSpeed (engineSpeed) and all deltaVehicleSpeed, vehicleSpeed (not receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed)) and engineSpeed <= 1500 and storedDeltaVehicleSpeed <= 0 implies gearShiftWidth1 = 1 and gearShiftDirection1 = Down and controlGearShift (gearShiftWidth1, gearShiftDirection1)) and
+	 	(all engineSpeed (not receiveEngineSpeed (engineSpeed)) and receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) and storedEngineSpeed <= 1500 and (deltaVehicleSpeed <= 0 or vehicleSpeed = 0) implies gearShiftWidth1 = 1 and gearShiftDirection1 = Down and controlGearShift (gearShiftWidth1, gearShiftDirection1)) and
+	 	(receiveEngineSpeed (engineSpeed) and receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) and engineSpeed <= 1500 and deltaVehicleSpeed > 0 implies all gearShiftWidth1, gearShiftDirection1 (not controlGearShift (gearShiftWidth1, gearShiftDirection1))) and
+	 	(receiveEngineSpeed (engineSpeed) and all deltaVehicleSpeed, vehicleSpeed (not receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed)) and engineSpeed <= 1500 and storedDeltaVehicleSpeed >= 0 and storedVehicleSpeed > 0 implies all gearShiftWidth1, gearShiftDirection1 (not controlGearShift (gearShiftWidth1, gearShiftDirection1))) and
+		(all engineSpeed (not receiveEngineSpeed (engineSpeed)) and	receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) and storedEngineSpeed <= 1500 and deltaVehicleSpeed >= 0 and vehicleSpeed > 0 implies all gearShiftWidth1, gearShiftDirection1 (not controlGearShift (gearShiftWidth1, gearShiftDirection1))) and
+		(receiveEngineSpeed (engineSpeed) and receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) and engineSpeed >= 1500 and	engineSpeed < 3000 implies all gearShiftWidth1, gearShiftDirection1	(not controlGearShift (gearShiftWidth1, gearShiftDirection1))) and
+		(receiveEngineSpeed (engineSpeed) and all deltaVehicleSpeed, vehicleSpeed (not receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed)) and engineSpeed >= 1500 and engineSpeed < 3000 implies all gearShiftWidth1, gearShiftDirection1 (not controlGearShift (gearShiftWidth1, gearShiftDirection1))) and
+		(all engineSpeed (not receiveEngineSpeed (engineSpeed)) and receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed) and storedEngineSpeed >= 1500 and storedEngineSpeed < 3000 implies all gearShiftWidth1, gearShiftDirection1 (not controlGearShift (gearShiftWidth1, gearShiftDirection1))) and
+		(all engineSpeed (not receiveEngineSpeed (engineSpeed)) and all deltaVehicleSpeed, vehicleSpeed (not receiveVehicleSpeed (deltaVehicleSpeed, vehicleSpeed)) implies	all gearShiftWidth1, gearShiftDirection1 (not controlGearShift (gearShiftWidth1, gearShiftDirection1)));
 		
-		ReceivingEventAction:
-			/*
-			 * Questo assioma permette di modellare il salvataggio dei valori
-			 * precedenti di velocita' di rotazione del motore, della velocita'
-			 * di marcia del veicolo e della differenza di velocita' di marcia.
-			 * Questi valori vengono aggiornati quando i sensori sollevano un
-			 * evento ed il valore non cambia finche' i sensori non sollevano
-			 * un nuovo evento.
-			 */
-			all deltaVehicleSpeed1, vehicleSpeed1
-			(
-				receiveVehicleSpeed (deltaVehicleSpeed1, vehicleSpeed1) ->
-				Until
-				(
-					storedDeltaVehicleSpeed = deltaVehicleSpeed1 &
-					storedVehicleSpeed = vehicleSpeed1,
-					ex deltaVehicleSpeed2, vehicleSpeed2
-					(
-						receiveVehicleSpeed (deltaVehicleSpeed2, vehicleSpeed2)
-					)
-				)
-			) &
-			all engineSpeed1
-			(
-				receiveEngineSpeed (engineSpeed1) ->
-				Until
-				(
-					storedEngineSpeed = engineSpeed1,
-					ex engineSpeed2
-					(
-						receiveEngineSpeed (engineSpeed2)
-					)
-				)
-			);
-				
-		MutualExclusions:
-			/*
-			 * Il TCU non invia nello stesso istante due comandi di cambio
-			 * marcia.
-			 */
-			all gearShiftWidth1, gearShiftDirection1
-			(
-				controlGearShift (gearShiftWidth1, gearShiftDirection1) ->
-				all gearShiftWidth2, gearShiftDirection2
-				(
-					gearShiftWidth1 <> gearShiftWidth2 &
-					gearShiftDirection1 <> gearShiftDirection2 ->
-					not controlGearShift (gearShiftWidth2, gearShiftDirection2)
-				)
-			) &
-			/*
-			 * Il TCU riceve un solo evento da ogni sensore in un istante di
-			 * tempo.
-			 */
-			all engineSpeed1
-			(
-				receiveEngineSpeed (engineSpeed1) ->
-				all engineSpeed2
-				(
-					engineSpeed2 <> engineSpeed1 ->
-					not receiveEngineSpeed (engineSpeed2)
-				)
-			) &
-			all deltaVehicleSpeed1, vehicleSpeed1
-			(
-				receiveVehicleSpeed (deltaVehicleSpeed1, vehicleSpeed1) ->
-				all deltaVehicleSpeed2, vehicleSpeed2
-				(
-					deltaVehicleSpeed2 <> deltaVehicleSpeed1 &
-					vehicleSpeed2 <> vehicleSpeed1 ->
-					not receiveVehicleSpeed (deltaVehicleSpeed2, vehicleSpeed2)
-				)
-			);
-			
+	ReceivingEventAction:
+		all deltaVehicleSpeed1, vehicleSpeed1 (receiveVehicleSpeed (deltaVehicleSpeed1, vehicleSpeed1) implies Until (storedDeltaVehicleSpeed = deltaVehicleSpeed1 and storedVehicleSpeed = vehicleSpeed1, ex deltaVehicleSpeed2, vehicleSpeed2	(receiveVehicleSpeed (deltaVehicleSpeed2, vehicleSpeed2)))) and
+		all engineSpeed1 (receiveEngineSpeed (engineSpeed1) implies	Until (storedEngineSpeed = engineSpeed1, ex engineSpeed2 (receiveEngineSpeed (engineSpeed2))));
+		
+	MutualExclusions:
+		all gearShiftWidth1, gearShiftDirection1 (controlGearShift (gearShiftWidth1, gearShiftDirection1) implies all gearShiftWidth2, gearShiftDirection2 (gearShiftWidth1 <> gearShiftWidth2 and gearShiftDirection1 <> gearShiftDirection2 implies not controlGearShift (gearShiftWidth2, gearShiftDirection2))) and
+		all engineSpeed1 (receiveEngineSpeed (engineSpeed1) implies	all engineSpeed2 (engineSpeed2 <> engineSpeed1 implies not receiveEngineSpeed (engineSpeed2))) and
+		all deltaVehicleSpeed1, vehicleSpeed1 (receiveVehicleSpeed (deltaVehicleSpeed1, vehicleSpeed1) implies all deltaVehicleSpeed2, vehicleSpeed2 (deltaVehicleSpeed2 <> deltaVehicleSpeed1 and vehicleSpeed2 <> vehicleSpeed1 implies not receiveVehicleSpeed (deltaVehicleSpeed2, vehicleSpeed2)));
+		
 end

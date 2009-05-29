@@ -1,0 +1,15 @@
+\section{PlanetaryGearSet Class}
+\label{Section:PlanetaryGearSet}
+The \emph{PlanetaryGearSet} class is formalized thanks to the code reported in Listing~\ref{Code:PlanetaryGearSet}.
+
+The Planetary Gear Set guarantees that every time a gear shift event occurs the \texttt{actualGear} will be maintained until the shift is finished.
+
+Inside this component are defined all axioms limiting gear shifts to effective ones only (e.g. it is impossibile to shift down a gear if \texttt{actualGear} is \texttt{First}.
+
+Moreover, through the formalization of the Planetary Gear Set we impose that we can't receive a gear shift event if we are in the middle of a gear shift. Different gear shifting times are defined for different gears and different steps.
+
+The gears \texttt{Drive}, \texttt{Park}, and \texttt{Reverse} can be selected if and only if the transmission shaft is decoupled from the engine.
+
+The state of the Planetary Gear Set changes if and only if an event occurs.
+
+\lstinputlisting[language=TRIO,tabsize=4,numbers=left,numberstyle=\small,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=PlanetaryGearSet.trio,label=Code:PlanetaryGearSet]{../src/PlanetaryGearSet.trio}

@@ -1,0 +1,11 @@
+\section{TransmissionControlUnit Class}
+\label{Section:TransmissionControlUnit}
+The \emph{TransmissionControlUnit} class is formalized thanks to the code reported in Listing~\ref{Code:TransmissionControlUnit}.
+
+Our first formalization of the Transmission Control Unit didn't take in account the possibility to have asynchronous sensors; the latest version of the Transmission Control Unit permits to manage asynchronous sensors thanks to internal memory modelled with three \texttt{time dependent total} values.
+
+When handle the necessity to scale gears till the \texttt{First} with the assumption that the human reaction is way slower than sampling frequency and mechanical reactions, so, when the vehicle stops, the axiom which handle the gear scale manage to be ``active'' the necessary amount of times to scale all the gears.
+
+The Transmission Control Unit guarantees that it doesn't raise more than one gear shift event per instant and it receives at most one event per instant from each sensor (this is described also in Section~\ref{Section:SpeedSensors} and so guaranteed in VehicleSpeedSensor and EngineSpeedSensor class).
+
+\lstinputlisting[language=TRIO,tabsize=4,numbers=left,numberstyle=\small,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=TransmissionControlUnit.trio,label=Code:TransmissionControlUnit]{../src/TransmissionControlUnit.trio}

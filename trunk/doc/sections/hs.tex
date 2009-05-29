@@ -1,0 +1,11 @@
+\section{HydraulicSystem Class}
+\label{Section:HydraulicSystem}
+The \emph{HydraulicSystem} class is formalized thanks to the code reported in Listing~\ref{Code:HydraulicSystem}.
+
+The first assumption we made before modelling the Hydraulic System was that every valve and electrovalve configuration imposes the same fluid propagation delay; this means that for every command that the Hydraulic System propagates the delay will always be the same. This behavior is formalized with the \texttt{time independent constant fluidPropagationDelay}.
+
+The \emph{manual valve}, which permit the driver to manually select the gear mode, is modelled thanks to the \texttt{gearHandle} event and the \texttt{GearHandle} axiom. During the time in which the Hydraulic System propagate a command there can be no \texttt{gearHandle} event which somehow means the fluid propagation is faster then the driver reaction time (which is a realistic assumption).
+
+Moreover, thanks to the \texttt{MutualExclusion} axiom, it's impossibile to generate two \texttt{gearHandle} event at the same time which means that the gear handle can't be for example in Park and Drive mode at the same instant.
+
+\lstinputlisting[language=TRIO,tabsize=4,numbers=left,numberstyle=\small,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=HydraulicSystem.trio,label=Code:HydraulicSystem]{../src/HydraulicSystem.trio}
