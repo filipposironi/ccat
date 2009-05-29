@@ -1,458 +1,87 @@
-class PlanetaryGearSet (
-	const singleGearShiftDelay,
-	const dualGearShiftDelay,
-	const driveGearShiftDelay,
-	const parkGearShiftDelay,
-	const reverseGearShiftDelay
-)
+class PlanetaryGearSet (const singleGearShiftDelay,	const dualGearShiftDelay, const driveGearShiftDelay, const parkGearShiftDelay, const reverseGearShiftDelay)
 
 signature: 
 
-	visible:
-		gearShift,
-		gearDrive,
-		gearPark,
-		gearReverse,
-		actualGear,
-		transmissionShaftState;
+visible:
+	actualGear,
+	transmissionShaftState;
+	gearShift,
+	gearDrive,
+	gearPark,
+	gearReverse,
 
-	temporal domain: real;
-	
-	domains:
-		Gear: {First, Second, Third, Park, Reverse};
-		ShiftWidth: 1..2;
-		ShiftDirection: {Up, Down};
-		TransmissionShaftState: {Attached, Detached};
+temporal domain: real;
 
-	items: 
-		event gearShift (ShiftWidth, ShiftDirection);
-		event gearDrive;
-		event gearPark;
-		event gearReverse;
-		TD total actualGear: Gear;
-		TD total transmissionShaftState: TransmissionShaftState;
-		/*
-		 * TI singleGearShiftDelay: real;
-		 * TI dualGearShiftDelay: real;
-		 * TI driveGearShiftDelay: real;
-		 * TI parkGearShiftDelay: real;
-		 * TI reverseGearShiftDelay: real;
-		 */
+domains:
+	Gear: {First, Second, Third, Park, Reverse};
+	TransmissionShaftState: {Attached, Detached};
+	ShiftWidth: 1..2;
+	ShiftDirection: {Up, Down};
+
+items: 
+	TI singleGearShiftDelay: real;
+	TI dualGearShiftDelay: real;
+	TI driveGearShiftDelay: real;
+	TI parkGearShiftDelay: real;
+	TI reverseGearShiftDelay: real;
+	TD total actualGear: Gear;
+	TD total transmissionShaftState: TransmissionShaftState;
+	event gearShift (ShiftWidth, ShiftDirection);
+	event gearDrive;
+	event gearPark;
+	event gearReverse;
 	
-	axioms:
-	vars:
-		gearShiftWidth: ShiftWidth;
-		gearShiftWidth2: ShiftWidth;
-		gearShiftDirection: ShiftDirection;
-		gearShiftDirection2: ShiftDirection;
-		gear: Gear;
-		t1: real;
-		t2: real;
-		t3: real;
-		t4: real;
-		t5: real;
-		t6: real;
-	formulae:
-		GearDriveShift:
-			/*
-		 	 * Questo assioma indica quando e' e quando non e' possibile
-		 	 * attivare la modalita' Drive del cambio. Per ogni evento di
-		 	 * gearDrive impone che la marcia attualmente innestata rimanga
-		 	 * attiva fino al termine dell'operazione di cambiata.
-		 	 */
-			(
-				actualGear = Reverse & gearDrive ->
-				(
-					Futr (actualGear = First, driveGearShiftDelay) &
-					Lasts (actualGear = Reverse, driveGearShiftDelay)
-				)
-			) &
-			(
-				actualGear = Park & gearDrive ->
-				(
-					Futr (actualGear = First, driveGearShiftDelay) &
-					Lasts (actualGear = Park, driveGearShiftDelay)
-				)
-			) &
-			(
-				actualGear = First |
-				actualGear = Second |
-				actualGear = Third ->
-				not gearDrive
-			) &
-			/*
-			 * L'attivazione della modalita' Drive e' possibile unicamente se
-			 * l'albero di trasmissione e' fermo (questo significa che il
-			 * Torque Converter ha fisicamente disaccoppiato il motore
-			 * dall'albero di trasmissione).
-			 */
-			(gearDrive <-> transmissionShaftState = Detached);
-				
-		GearShiftsFirst:
-			/*
-			 * Questo assioma indica le operazioni che non possono essere
-			 * attivate quando il cambio e' in prima marcia, ed inoltre,
-			 * modella il comportamento del cambio quando si vogliono innestare
-			 * una o due marce imponendo che durante l'operazione di cambiata
-			 * la prima marcia rimanga attiva.
-			 *
-			 * NB: la scalata e' impedita.
-			 */
-			(
-				actualGear = First ->
-				Alw
-				(
-					not gearDrive &
-					not ex gearShiftWidth
-					(
-						gearShiftDirection = Down &
-						gearShift (gearShiftWidth, gearShiftDirection)
-					)
-				)
-			) &
-			(
-				actualGear = First -> SomF (gearPark | gearReverse)
-			) &
-			(
-				actualGear = First & 
-				gearShiftWidth = 1 & gearShiftDirection = Up &
-				gearShift (gearShiftWidth, gearShiftDirection) ->
-				Futr (actualGear = Second, singleGearShiftDelay) &
-				Lasts (actualGear = First, singleGearShiftDelay)
-			) & 
-			(
-				actualGear = First &
-				gearShiftWidth = 2 & gearShiftDirection = Up &
-				gearShift (gearShiftWidth, gearShiftDirection) ->
-				Futr (actualGear = Third, dualGearShiftDelay) &
-				Lasts (actualGear = First, dualGearShiftDelay)
-			);
-		
-		GearShiftsSecond:
-			/*
-			 * Questo assioma indica le operazioni che non possono essere
-			 * attivate quando il cambio e' in seconda marcia, ed inoltre,
-			 * modella il comportamento del cambio quando si vuole innestare
-			 * o togliere una marcia imponendo che durante l'operazione di
-			 * cambiata la seconda marcia rimanga attiva.
-			 *
-			 * NB: la scalata o l'innesto di due marce e' impedita.
-			 */
-			(
-				actualGear = Second ->
-				Alw
-				(
-					not gearDrive & not gearPark & not gearReverse &
-					not ex gearShiftDirection
-					(
-						gearShiftWidth = 2 &
-						gearShift (gearShiftWidth, gearShiftDirection)
-					)
-				)
-			) &
-			(
-				actualGear = Second &
-				gearShiftWidth = 1 & gearShiftDirection = Up &
-				gearShift (gearShiftWidth, gearShiftDirection) ->
-				Futr (actualGear = Third, singleGearShiftDelay) &
-				Lasts (actualGear = Second, singleGearShiftDelay)
-			) &
-			(
-				actualGear = Second &
-				gearShiftWidth = 1 & gearShiftDirection = Down &
-				gearShift (gearShiftWidth, gearShiftDirection) ->
-				Futr (actualGear = First, singleGearShiftDelay) &
-				Lasts (actualGear = Second, singleGearShiftDelay)
-			);
-		
-		GearShiftsThird:
-			/*
-			 * Questo assioma indica le operazioni che non possono essere
-			 * attivate quando il cambio e' in terza marcia, ed inoltre,
-			 * modella il comportamento del cambio quando si vogliono scalare
-			 * una o due marce imponendo che durante l'operazione di cambiata
-			 * la terza marcia rimanga attiva.
-			 *
-			 * NB: l'innesto e' impedito.
-			 */
-			(
-				actualGear = Third ->
-				Alw
-				(
-					not gearDrive & not gearPark & not gearReverse &
-					not ex gearShiftWidth
-					(
-						gearShiftDirection = Up &
-						gearShift (gearShiftWidth, gearShiftDirection)
-					)
-				)
-			) &
-			(
-				actualGear = Third &
-				gearShiftWidth = 1 & gearShiftDirection = Down &
-				gearShift (gearShiftWidth, gearShiftDirection) ->
-				Futr (actualGear = Second, singleGearShiftDelay) &
-				Lasts (actualGear = Third, singleGearShiftDelay)
-			) &
-			(
-				actualGear = Third &
-				gearShiftWidth = 2 & gearShiftDirection = Down &
-				gearShift (gearShiftWidth, gearShiftDirection) ->
-				Futr (actualGear = First, dualGearShiftDelay) &
-				Lasts (actualGear = Third, dualGearShiftDelay)
-			);
-		
-		GearShiftsReverse:
-			/*
-		 	 * Questo assioma indica quando e' e quando non e' possibile
-		 	 * attivare la modalita' Reverse del cambio. Per ogni evento di
-		 	 * gearReverse impone che la marcia attualmente innestata rimanga
-		 	 * attiva fino al termine dell'operazione di cambiata.
-		 	 */
-			(
-				actualGear = Reverse ->
-				Alw
-				(
-					not gearReverse &
-					all gearShiftWidth, gearShiftDirection
-					(
-						not gearShift (gearShiftWidth, gearShiftDirection)
-					)
-				)
-			) &
-			(actualGear = Reverse -> SomF (gearDrive | gearPark)) &
-			(
-				actualGear = First & gearReverse ->
-				Futr (actualGear = Reverse, reverseGearShiftDelay) &
-				Lasts (actualGear = First, reverseGearShiftDelay)
-			) &
-			(
-				actualGear = Park & gearReverse	->
-				Futr (actualGear = Reverse, reverseGearShiftDelay) &
-				Lasts (actualGear = Park, reverseGearShiftDelay)
-			) &
-			/*
-			 * L'attivazione della modalita' Reverse e' possibile unicamente se
-			 * l'albero di trasmissione e' fermo (questo significa che il
-			 * Torque Converter ha fisicamente disaccoppiato il motore
-			 * dall'albero di trasmissione).
-			 */
-			(gearReverse <-> transmissionShaftState = Detached);
-		
-		GearShiftsPark:
-			/*
-		 	 * Questo assioma indica quando e' e quando non e' possibile
-		 	 * attivare la modalita' Park del cambio. Per ogni evento di
-		 	 * gearPark impone che la marcia attualmente innestata rimanga
-		 	 * attiva fino al termine dell'operazione di cambiata.
-		 	 */
-			(
-				actualGear = Park ->
-				Alw
-				(
-					not gearPark &
-					all gearShiftWidth, gearShiftDirection
-					(
-						not gearShift (gearShiftWidth, gearShiftDirection)
-					)
-				)
-			) &
-			(actualGear = Park -> SomF (gearDrive | gearReverse)) &
-			(
-				actualGear = First & gearPark ->
-				Futr (actualGear = Park, parkGearShiftDelay) &
-				Lasts (actualGear = First, parkGearShiftDelay)
-			) &
-			(
-				actualGear = Reverse & gearPark ->
-				Futr (actualGear = Park, parkGearShiftDelay) &
-				Lasts (actualGear = Reverse, parkGearShiftDelay)
-			) &
-			/*
-			 * L'attivazione della modalita' Park e' possibile unicamente se
-			 * l'albero di trasmissione e' fermo (questo significa che il
-			 * Torque Converter ha fisicamente disaccoppiato il motore
-			 * dall'albero di trasmissione).
-			 */
-			(gearPark <-> transmissionShaftState = Detached);
+axioms:
+vars:
+	gearShiftWidth: ShiftWidth;
+	gearShiftWidth2: ShiftWidth;
+	gearShiftDirection: ShiftDirection;
+	gearShiftDirection2: ShiftDirection;
+	gear: Gear;
+formulae:
+	GearDriveShift:
+		(actualGear = Reverse and gearDrive implies	(Lasts (actualGear = Reverse, driveGearShiftDelay) and Futr (actualGear = First, driveGearShiftDelay))) and
+		(actualGear = Park and gearDrive implies (Lasts (actualGear = Park, driveGearShiftDelay) and Futr (actualGear = First, driveGearShiftDelay))) and
+		(actualGear = First or actualGear = Second or actualGear = Third implies not gearDrive) and
+		(gearDrive iff transmissionShaftState = Detached);
 			
-		GearShiftsTimings:
-			/*
-			 * Questo assioma impone che durante il tempo necessario per attuare
-			 * la cambiata non possano essere sollevati altri eventi di
-			 * cambiata.
-			 */
-			all gearShiftDirection
-			(
-				(actualGear = First | actualGear = Second | actualGear = Third)
-				&
-				gearShiftWidth = 1 &
-				gearShift (gearShiftWidth, gearShiftDirection) ->
-				not ex t1
-				(
-					0 < t1 <= singleGearShiftDelay &
-					(
-						(
-							Futr (gearDrive, t1) |
-							Futr (gearPark, t1) |
-							Futr (gearReverse, t1) |
-							ex gearShiftWidth2, gearShiftDirection2
-							(
-								Futr
-								(
-									gearShift (
-										gearShiftWidth2, gearShiftDirection2
-									),
-									t1
-								)
-							)
-						)
-					)
-				)
-			) &
-			all gearShiftDirection
-			(
-				(actualGear = First | actualGear = Third) &
-				gearShiftWidth = 2 &
-				gearShift (gearShiftWidth, gearShiftDirection) ->
-				not ex t2
-				(
-					0 < t <= dualGearShiftDelay &
-					(
-						(
-							Futr (gearDrive, t2) |
-							Futr (gearPark, t2) |
-							Futr (gearReverse, t2) |
-							ex gearShiftWidth2, gearShiftDirection2
-							(
-								Futr
-								(
-									gearShift (
-										gearShiftWidth2, gearShiftDirection2
-									),
-									t2
-								)
-							)
-						)
-					)
-				)
-			) &
-			(
-				(actualGear = Reverse & gearDrive) ->
-				not ex t3
-				(
-					0 < t3 <= driveGearShiftDelay &
-					(
-						(
-							Futr (gearDrive, t3) |
-							Futr (gearPark, t3) |
-							Futr (gearReverse, t3) |
-							ex gearShiftWidth2, gearShiftDirection2
-							(
-								Futr
-								(
-									gearShift (
-										gearShiftWidth2, gearShiftDirection2
-									),
-									t3
-								)
-							)
-						)
-					)
-				)
-			) &
-			(
-				(actualGear = Reverse & gearPark) ->
-				not ex t4
-				(
-					0 < t4 <= parkGearShiftDelay &
-					(
-						(
-							Futr (gearDrive, t4) |
-							Futr (gearPark, t4) |
-							Futr (gearReverse, t4) |
-							ex gearShiftWidth2, gearShiftDirection2
-							(
-								Futr
-								(
-									gearShift (
-										gearShiftWidth2, gearShiftDirection2
-									), t4
-								)
-							)
-						)
-					)
-				)
-			) &
-			(
-				(actualGear = Park & gearDrive) ->
-				not ex t5
-				(
-					0 < t5 <= driveGearShiftDelay &
-					(
-						(
-							Futr (gearDrive, t5) |
-							Futr (gearPark, t5) |
-							Futr (gearReverse, t5) |
-							ex gearShiftWidth2, gearShiftDirection2
-							(
-								Futr
-								(
-									gearShift (
-										gearShiftWidth2, gearShiftDirection2
-									),
-									t5
-								)
-							)
-						)
-					)
-				)
-			) &
-			(
-				(actualGear = Park & gearReverse) ->
-				not ex t6
-				(
-					0 < t6 <= reverseGearShiftDelay &
-					(
-						(
-							Futr (gearDrive, t6) |
-							Futr (gearPark, t6) |
-							Futr (gearReverse, t6) |
-							ex gearShiftWidth2, gearShiftDirection2
-							(
-								Futr
-								(
-									gearShift (
-										gearShiftWidth2, gearShiftDirection2
-									),
-									t6
-								)
-							)
-						)
-					)
-				)
-			);
-
-		Nothing:
-			/*
-			 * Questo assioma garantisce che se non si ricevono eventi di
-			 * cambiata allora lo stato del sistema permane.
-			 */
-			all gear
-			(
-				actualGear = gear &
-				not
-				(
-					all gearShiftWidth, gearShiftDirection
-					(
-						gearShift (gearShiftWidth, gearShiftDirection)
-					) |
-					gearDrive |
-					gearPark |
-					gearReverse
-				) ->
-				ex t1 (t1 > 0 & Lasts (actualGear = gear, t1)) &
-				ex t2 (t2 > 0 & Lasted (actualGear = gear, t2))
-			);
+	GearShiftsFirst:
+		(actualGear = First implies Alw (not gearDrive and not ex gearShiftWidth (gearShiftDirection = Down and gearShift (gearShiftWidth, gearShiftDirection)))) and
+		(actualGear = First and gearShiftWidth = 1 and gearShiftDirection = Up and gearShift (gearShiftWidth, gearShiftDirection) implies Lasts (actualGear = First, singleGearShiftDelay) and Futr (actualGear = Second, singleGearShiftDelay)) and 
+		(actualGear = First and gearShiftWidth = 2 and gearShiftDirection = Up and gearShift (gearShiftWidth, gearShiftDirection) implies Lasts (actualGear = First, dualGearShiftDelay) and Futr (actualGear = Third, dualGearShiftDelay);
+		
+	GearShiftsSecond:
+		(actualGear = Second implies Alw (not gearDrive and not gearPark and not gearReverse and not ex gearShiftDirection (gearShiftWidth = 2 and gearShift (gearShiftWidth, gearShiftDirection)))) and
+		(actualGear = Second and gearShiftWidth = 1 and gearShiftDirection = Up and	gearShift (gearShiftWidth, gearShiftDirection) implies Lasts (actualGear = Second, singleGearShiftDelay) and Futr (actualGear = Third, singleGearShiftDelay)) and
+		(actualGear = Second and gearShiftWidth = 1 and gearShiftDirection = Down and gearShift (gearShiftWidth, gearShiftDirection) implies Lasts (actualGear = Second, singleGearShiftDelay) and Futr (actualGear = First, singleGearShiftDelay));
+		
+	GearShiftsThird:
+		(actualGear = Third implies	Alw	(not gearDrive and not gearPark and not gearReverse and	not ex gearShiftWidth (gearShiftDirection = Up and gearShift (gearShiftWidth, gearShiftDirection)))) and
+		(actualGear = Third and	gearShiftWidth = 1 and gearShiftDirection = Down and gearShift (gearShiftWidth, gearShiftDirection) implies	Lasts (actualGear = Third, singleGearShiftDelay) and Futr (actualGear = Second, singleGearShiftDelay)) and
+		(actualGear = Third and	gearShiftWidth = 2 and gearShiftDirection = Down and gearShift (gearShiftWidth, gearShiftDirection) implies	Lasts (actualGear = Third, dualGearShiftDelay) and Futr (actualGear = First, dualGearShiftDelay));
+		
+	GearShiftsReverse:
+		(actualGear = Reverse implies Alw (not gearReverse and all gearShiftWidth, gearShiftDirection (not gearShift (gearShiftWidth, gearShiftDirection)))) and
+		(actualGear = Reverse implies SomF (gearDrive or gearPark)) and	(actualGear = First and gearReverse implies	Lasts (actualGear = First, reverseGearShiftDelay) and Futr (actualGear = Reverse, reverseGearShiftDelay)) and
+		(actualGear = Park and gearReverse implies Lasts (actualGear = Park, reverseGearShiftDelay) and	Futr (actualGear = Reverse, reverseGearShiftDelay)) and
+		(gearReverse iff transmissionShaftState = Detached);
+		
+	GearShiftsPark:
+		(actualGear = Park implies Alw (not gearPark and all gearShiftWidth, gearShiftDirection	(not gearShift (gearShiftWidth, gearShiftDirection)))) and
+		(actualGear = Park implies SomF (gearDrive or gearReverse)) and
+		(actualGear = First and gearPark implies Lasts (actualGear = First, parkGearShiftDelay) and Futr (actualGear = Park, parkGearShiftDelay)) and
+		(actualGear = Reverse and gearPark implies Lasts (actualGear = Reverse, parkGearShiftDelay) and Futr (actualGear = Park, parkGearShiftDelay)Futr (actualGear = Park, parkGearShiftDelay)) and
+		(gearPark iff transmissionShaftState = Detached);
+		
+	GearShiftsTimings:
+		all gearShiftDirection ((actualGear = First or actualGear = Second or actualGear = Third) and gearShiftWidth = 1 and gearShift (gearShiftWidth, gearShiftDirection) implies not Lasts (gearDrive or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (gearShift (gearShiftWidth2, gearShiftDirection2)), singleGearShiftDelay)) and
+		all gearShiftDirection ((actualGear = First or actualGear = Third) and gearShiftWidth = 2 and gearShift (gearShiftWidth, gearShiftDirection) implies not Lasts (gearDrive or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (gearShift (gearShiftWidth2, gearShiftDirection2)), dualGearShiftDelay)) and
+		((actualGear = Reverse and gearDrive) implies not Lasts (gearDrive or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (gearShift (gearShiftWidth2, gearShiftDirection2)), driveGearShiftDelay)) and
+		((actualGear = Reverse and gearPark) implies not Lasts (gearDrive or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (gearShift (gearShiftWidth2, gearShiftDirection2)), parkGearShiftDelay)) and
+		((actualGear = Park and gearDrive) implies not Lasts (gearDriver or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (gearShift (gearShiftWidth2, gearShiftDirection2)), driveGearShiftDelay)) and
+		((actualGear = Park and gearReverse) implies not Lasts (gearDrive or gearPark or gearReverse or ex gearShiftWidth2, gearShiftDirection2 (gearShift (gearShiftWidth2, gearShiftDirection2)), reverseGearShiftDelay));
+		
+	Nothing:
+		all gear (actualGear = gear and	not	(all gearShiftWidth, gearShiftDirection	(gearShift (gearShiftWidth, gearShiftDirection)) or	gearDrive or gearPark or gearReverse) implies UpToNow (actualGear = gear) and NowOn (actualGear = gear));
 			
 end
