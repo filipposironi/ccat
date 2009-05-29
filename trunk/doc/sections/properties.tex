@@ -1,0 +1,10 @@
+\section{Properties}
+\label{Section:Properties}
+
+\begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 1,label=Code:Property1]
+actualGear = First and controlGearShift (1, Up) implies Futr (actualGear = Second, fluidPropagationDelay + singleGearShiftDelay)
+\end{lstlisting}
+
+\begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 2,label=Code:Property2]
+gear = Park and gearHandle (gear) and Futr (actualGear = Park, fluidPropagationDelay + parkGearShiftDelay) iff Lasts (transmissionShaftState = Detached, fluidPropagationDelay + parkGearShiftDelay)
+\end{lstlisting}
