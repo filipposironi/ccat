@@ -1,0 +1,129 @@
+variables
+
+	/* 1: first, 2:second, 3:third, 4:park, 5:reverse */
+	actualGear: [1..5], 	
+	
+	/* 0: detached, 1: attached */
+	transmissionShaftState: [0..1], 
+	
+	gearShift: [0..3], /*
+						* 0: 1 up
+						* 1: 2 up
+						* 2: 1 down
+						* 3: 2 down
+						*/
+	
+	gearDrive: [0..1],
+	gearPark: [0..1],
+	gearReverse: [0..1]
+			
+constants
+	singleGearShiftDelay = 2,
+	dualGearShiftDelay = 2,	 
+	driveGearShiftDelay = 2,
+	parkGearShiftDelay = 2,
+	reverseGearShiftDelay = 2
+	
+axioms
+
+	Start:
+		Now(actualGear = 4);
+		
+	Annotations:
+		actualGear = Park -> transmissionShaftState = 0;
+	
+	GearDriveShift:
+		(actualGear = 5 & gearDrive = 1 -> (Lasts(actualGear = 5, driveGearShiftDelay) & Futr(actualGear = 1, driveGearShiftDelay)))
+		&
+		(actualGear = 4 & gearDrive = 1 -> (Lasts (actualGear = Park, driveGearShiftDelay) & Futr (actualGear = First, driveGearShiftDelay))) 
+		&
+		(actualGear = 1 | actualGear = 2 | actualGear = 3 -> not gearDrive = 1)
+		&
+		(gearDrive = 1 -> transmissionShaftState = 0)
+		&
+		(transmissionShaftState = 0 -> gearDrive = 1);
+		
+	GearDriveFirst:
+		(actualGear = 1 -> AlwF (not gearDrive = 1 & not (gearShift = 2 | gearShift = 3))) 
+		&
+		(actualGear = 1 & gearShift = 0 -> Lasts (actualGear = 1, singleGearShiftDelay) & Futr (actualGear = 2, singleGearShiftDelay))
+		&	
+		(actualGear = 1 & gearShift = 1 -> Lasts (actualGear = 1, dualGearShiftDelay) &	Futr (actualGear = 3, dualGearShiftDelay));
+		
+	GearShiftsSecond:
+		(actualGear = 2 -> AlwF (not gearDrive = 1 & not gearPark = 1 & not gearReverse = 1 & not (gearShift=1 | gearShift=3))) 
+		&
+		(actualGear = 2 & gearShift = 0 -> Lasts (actualGear = 2, singleGearShiftDelay) & Futr (actualGear = 3, singleGearShiftDelay))
+		&
+		(actualGear = 2 & gearShift = 2 -> Lasts (actualGear = 2, singleGearShiftDelay) & Futr (actualGear = 1, singleGearShiftDelay));		
+	
+	GearShiftsThird:
+		(actualGear = 3 -> AlwF (not gearDrive = 1 & not gearPark = 1 & not gearReverse = 1 & not (gearShift = 0 | gearShift = 1)))
+		&
+		(actualGear = 3 & gearShift = 2 -> Lasts (actualGear = 3, singleGearShiftDelay) & Futr (actualGear = 2, singleGearShiftDelay))
+		&
+		(actualGear = 3 & gearShift = 3 -> Lasts (actualGear = 3, dualGearShiftDelay) & Futr (actualGear = 1, dualGearShiftDelay));
+						
+	GearShiftsReverse:
+		(actualGear = 5 -> AlwF (not gearReverse=1 & not (gearShift = 0 | gearShift = 1 | gearShift = 2 | gearShift = 3) ))
+		&
+		(actualGear = 5 -> SomF (gearDrive = 1 | gearPark = 1))
+		&
+		(actualGear = 1 & gearReverse = 1 -> Lasts (actualGear = 1, reverseGearShiftDelay) & Futr (actualGear = 5, reverseGearShiftDelay)) 
+		&
+		(actualGear = 4 & gearReverse = 1 -> Lasts (actualGear = 4, reverseGearShiftDelay) & Futr (actualGear = 5, reverseGearShiftDelay))
+		&
+		(gearReverse = 1 -> transmissionShaftState = 0)
+		&
+		(transmissionShaftState = 0 -> gearReverse = 1); 
+		
+	GearShiftsPark:
+		(actualGear = 4 -> AlwF (not gearPark = 1 & not (gearShift = 0 | gearShift = 1 | gearShift = 2 | gearShift = 3) )) 
+		&
+		(actualGear = 4 -> SomF (gearDrive = 1 | gearReverse = 1))
+		&
+		(actualGear = 1 & gearPark = 1 -> Lasts (actualGear = 1, parkGearShiftDelay) & Futr (actualGear = 4, parkGearShiftDelay))
+		&
+		(actualGear = 5 & gearPark = 1 -> Lasts (actualGear = 5, parkGearShiftDelay) & Futr (actualGear = 4, parkGearShiftDelay))
+		&
+		(gearPark = 1 -> transmissionShaftState = 0)
+		&
+		(transmissionShaftState = 0 -> gearPark = 1);
+		
+		
+	GearShiftsTimings:		
+		(
+			(actualGear = 1 | actualGear = 2 | actualGear = 3) & (gearShift = 0 | gearShift = 2) 
+				->  
+			not Lasts (gearDrive = 1 | gearPark = 1 | gearReverse = 1 | gearShift = 0 | gearShift = 1 | gearShift = 2 | gearShift = 3, singleGearShiftDelay)
+		)
+		&
+		(
+			(actualGear = 1 | actualGear = 3) & (gearShift = 1 | gearShift = 3) 
+				->
+			not Lasts (gearDrive = 1 | gearPark = 1 | gearReverse = 1 | gearShift = 0 | gearShift = 1 | gearShift = 2 | gearShift = 3, dualGearShiftDelay)
+		)
+		&
+		(
+			(actualGear = 5 & gearDrive = 1) 
+				-> 
+			not Lasts (gearDrive = 1 | gearPark = 1 | gearReverse = 1 | gearShift = 0 | gearShift = 1 | gearShift = 2 | gearShift = 3, driveGearShiftDelay)
+		)
+		&
+		(
+			(actualGear = 5 & gearPark = 1) 
+				-> 
+			not Lasts (gearDrive = 1 | gearPark = 1 | gearReverse = 1 | gearShift = 0 | gearShift = 1 | gearShift = 2 | gearShift = 3, parkGearShiftDelay)
+		)
+		&
+		(
+			(actualGear = 4 & gearDrive = 1) 
+				-> 
+			not Lasts (gearDrive = 1 | gearPark = 1 | gearReverse = 1 | gearShift = 0 | gearShift = 1 | gearShift = 2 | gearShift = 3, driveGearShiftDelay)
+		)
+		&
+		(
+			(actualGear = 4 & gearReverse = 1) 
+				-> 
+			not Lasts (gearDrive = 1 | gearPark = 1 | gearReverse = 1 | gearShift = 0 | gearShift = 1 | gearShift = 2 | gearShift = 3, reverseGearShiftDelay)
+		);
