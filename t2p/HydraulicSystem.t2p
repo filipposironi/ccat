@@ -1,83 +1,38 @@
 variables
-
-	/* 0:drive, 1:park, 2:reverse */
-	gearHandle: [0..2],
-
-	gearShift: [0..3], /*
-						* 0: 1 up
-						* 1: 2 up
-						* 2: 1 down
-						* 3: 2 down
-						*/
-	gearDrive:[0..1],
-	gearPark:[0..1],
-	gearReverse:[0..1],
- 	controlGearShift: [0..3]   /*
-								* 0: 1 up
-								* 1: 2 up
-								* 2: 1 down
-								* 3: 2 down
-								*/ 
+	gearHandle:[0..3],
+	controlGearShift:[0..4],
+	gearShift:[0..7]
 
 constants
-
-	fluidPropagationDelay = 2;
+	noEvent=0,
+	handleDrive=1, handlePark=2, handleReverse=3,
+	TCUOneUp = 1, TCUTwoUp=2, TCUOneDown=3, TCUTwoDown=4,
+	shiftDrive=1, shiftOneUp=2, shiftTwoUp=3, shiftOneDown=4, shiftTwoDown=5, shiftPark=6, shiftReverse=7,
+	fluidPropagationDelay=1
 
 axioms
-
 	Start:
-		Now(gearHandle = 1);
+		Now(gearHandle=handleDrive);
 
 	GearHandleCommand:
-		(gearHandle = 0 
-				-> 
-			not Lasts (	gearHandle = 1 |  
-						gearHandle = 2 | 
-						controlGearShift = 0 | 
-						controlGearShift = 1 | 
-						controlGearShift = 2 | 
-						controlGearShift = 3, fluidPropagationDelay) & Futr (gearDrive = 1, fluidPropagationDelay) 
-		)	
-		&
-		(gearHandle = 1 
-				-> 
-			not Lasts (	gearHandle = 0 |  
-						gearHandle = 2 | 
-						controlGearShift = 0 | 
-						controlGearShift = 1 | 
-						controlGearShift = 2 | 
-						controlGearShift = 3, fluidPropagationDelay) & Futr (gearPark = 1, fluidPropagationDelay) 
-		)	
-		&
-		(gearHandle = 2 
-				->
-			not Lasts (	gearHandle = 0 | 
-		 				gearHandle = 1 | 
-						controlGearShift = 0 | 
-						controlGearShift = 1 | 
-						controlGearShift = 2 | 
-						controlGearShift = 3, fluidPropagationDelay) & Futr (gearReverse, fluidPropagationDelay)
-	    );
-	
+		(gearHandle=handleDrive ->
+			Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) &
+			Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) &
+			Futr(gearShift=shiftDrive, fluidPropagationDelay)) &
+		(gearHandle=handlePark ->
+			Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) &
+			Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) &
+			Futr(gearShift=shiftPark, fluidPropagationDelay)) &
+		(gearHandle=handleReverse ->
+			Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) &
+			Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) &
+			Futr(gearShift=shiftReverse, fluidPropagationDelay));
 	
 	PropagateGearShiftCommand:
-	
-			((controlGearShift = 0 | controlGearShift = 1 | controlGearShift = 2 | controlGearShift = 3)
-			 		-> 
-				not Lasts ( gearDrive = 1 | 
-							gearPark = 1 | 
-							gearReverse = 1 | 
-							controlGearShift = 0 | 
-							controlGearShift = 1 | 
-							controlGearShift = 2 | 
-							controlGearShift = 3, fluidPropagationDelay)
-			) &
-			(controlGearShift = 0 ->  Futr (gearShift = 0 , fluidPropagationDelay)) &
-			(controlGearShift = 1 ->  Futr (gearShift = 1 , fluidPropagationDelay)) &
-			(controlGearShift = 2 ->  Futr (gearShift = 2 , fluidPropagationDelay)) &
-			(controlGearShift = 3 ->  Futr (gearShift = 3 , fluidPropagationDelay));
-
-	MutualExclusions:
-			gearHandle = 0 -> not (gearHandle = 1 | gearHandle = 2) &
-			gearHandle = 1 -> not (gearHandle = 0 | gearHandle = 2) &
-			gearHandle = 2 -> not (gearHandle = 0 | gearHandle = 1);
+		(controlGearShift=TCUOneUp | controlGearShift=TCUTwoUp | controlGearShift=TCUOneDown | controlGearShift=TCUTwoDown) -> 
+			Lasts_ii(gearHandle=noEvent, fluidPropagationDelay) &
+			Lasts_ei(controlGearShift=noEvent, fluidPropagationDelay) &
+			(controlGearShift=TCUOneUp -> Futr(gearShift=shiftOneUp, fluidPropagationDelay)) &
+			(controlGearShift=TCUTwoUp -> Futr(gearShift=shiftTwoUp, fluidPropagationDelay)) &
+			(controlGearShift=TCUOneDown -> Futr(gearShift=shiftOneDown, fluidPropagationDelay)) &
+			(controlGearShift=TCUTwoDown -> Futr(gearShift=shiftTwoDown, fluidPropagationDelay));
