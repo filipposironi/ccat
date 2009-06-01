@@ -1,0 +1,35 @@
+class EngineSpeedSensor (const sampleInterval, const sampleDelay)
+
+signature: 
+
+visible: actualSpeed, sendSpeed;
+
+temporal domain: real;
+
+items:
+	TI sampleInterval: real;
+	TI sampleDelay: real;
+	TD total actualSpeed: integer;
+	event sendSpeed (integer);
+	event sampleSpeed;
+	
+axioms:
+vars:
+	speed: integer;
+formulae:
+	SpeedValues:
+		actualSpeed >= 0;
+		
+	BeginSample:
+		SomP (sampleSpeed);
+		
+	SamplingDefinition:
+		sampleSpeed implies	Futr (sampleSpeed, sampleInterval) and not Lasts (sampleSpeed, sampleInterval);
+		
+	SampleSpeedActions:
+		sampleSpeed implies Futr (actualSpeed = speed and sendSpeed (speed), sampleDelay);
+		
+	SendSpeed:
+		actualSpeed = speed and sendSpeed (speed) implies Past (sampleSpeed, sampleDelay);
+								
+end
