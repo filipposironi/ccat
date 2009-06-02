@@ -1,6 +1,6 @@
 variables
 	transmissionShaftState:[0..1],
-	actualGear:[1..5],
+	actualGear:[0..4],
 	gearShift:[0..7]
 			
 constants
