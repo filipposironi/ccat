@@ -65,3 +65,9 @@ axioms
 		(actualGear=park & gearShift=shiftDrive -> Lasts_ei(gearShift=noEvent, driveGearShiftDelay) & Futr(actualGear=first, driveGearShiftDelay)) &
 		(actualGear=park & gearShift=shiftReverse -> Lasts_ei(gearShift=noEvent, reverseGearShiftDelay) & Futr(actualGear=reverse, reverseGearShiftDelay)) &
 		(gearShift=shiftReverse -> transmissionShaftState=detached);
+
+	PropertyOne:
+		not(actualGear=first & controlGearShift=shiftOneUp -> Futr(actualGear=second, fluidPropagationDelay+singleGearShiftDelay));
+		
+	PropertyTwo:
+		not(gearHandle=handlePark & Futr(actualGear=park, fluidPropagationDelay+parkGearShiftDelay) -> Lasts(transmissionShaftState=detached, fluidPropagationDelay+parkGearShiftDelay));
