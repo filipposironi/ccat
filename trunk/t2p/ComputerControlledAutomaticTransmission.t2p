@@ -22,27 +22,16 @@ axioms
 		gearShift=shiftOneUp | gearShift=shiftTwoUp -> transmissionShaftState=attached;
 	
 	PropagateGearShiftCommand:
-		(controlGearShift=TCUOneUp | controlGearShift=TCUTwoUp | controlGearShift=TCUOneDown | controlGearShift=TCUTwoDown) -> 
-			Lasts_ii(gearHandle=noEvent, fluidPropagationDelay) &
-			Lasts_ei(controlGearShift=noEvent, fluidPropagationDelay) &
-			(controlGearShift=TCUOneUp -> Futr(gearShift=shiftOneUp, fluidPropagationDelay)) &
-			(controlGearShift=TCUTwoUp -> Futr(gearShift=shiftTwoUp, fluidPropagationDelay)) &
-			(controlGearShift=TCUOneDown -> Futr(gearShift=shiftOneDown, fluidPropagationDelay)) &
-			(controlGearShift=TCUTwoDown -> Futr(gearShift=shiftTwoDown, fluidPropagationDelay));
+		(controlGearShift=TCUOneUp | controlGearShift=TCUTwoUp | controlGearShift=TCUOneDown | controlGearShift=TCUTwoDown -> Lasts_ii(gearHandle=noEvent, fluidPropagationDelay) & Lasts_ei(controlGearShift=noEvent, fluidPropagationDelay)) &
+		(controlGearShift=TCUOneUp -> Futr(gearShift=shiftOneUp, fluidPropagationDelay)) &
+		(controlGearShift=TCUTwoUp -> Futr(gearShift=shiftTwoUp, fluidPropagationDelay)) &
+		(controlGearShift=TCUOneDown -> Futr(gearShift=shiftOneDown, fluidPropagationDelay)) &
+		(controlGearShift=TCUTwoDown -> Futr(gearShift=shiftTwoDown, fluidPropagationDelay));
 	
 	GearHandleCommand:
-		(gearHandle=handleDrive ->
-			Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) &
-			Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) &
-			Futr(gearShift=shiftDrive, fluidPropagationDelay)) &
-		(gearHandle=handlePark ->
-			Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) &
-			Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) &
-			Futr(gearShift=shiftPark, fluidPropagationDelay)) &
-		(gearHandle=handleReverse ->
-			Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) &
-			Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) &
-			Futr(gearShift=shiftReverse, fluidPropagationDelay));
+		(gearHandle=handleDrive -> Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) & Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) & Futr(gearShift=shiftDrive, fluidPropagationDelay)) &
+		(gearHandle=handlePark -> Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) & Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) & Futr(gearShift=shiftPark, fluidPropagationDelay)) &
+		(gearHandle=handleReverse -> Lasts_ii(controlGearShift=noEvent, fluidPropagationDelay) & Lasts_ei(gearHandle=noEvent, fluidPropagationDelay) & Futr(gearShift=shiftReverse, fluidPropagationDelay));
 	
 	GearShiftDrive:
 		gearShift=shiftDrive -> transmissionShaftState=detached;
