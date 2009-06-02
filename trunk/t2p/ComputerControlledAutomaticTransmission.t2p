@@ -2,7 +2,7 @@ variables
 	controlGearShift:[0..4],
 	gearHandle:[0..3],
 	gearShift:[0..7],
-	actualGear:[1..5],
+	actualGear:[0..4],
 	transmissionShaftState:[0..1]
 
 constants
