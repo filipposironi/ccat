@@ -768,7 +768,7 @@ atomic{
 		::flag==1 -> s=0; goto gen;
 		::flag!=1 ->
 			if
-				::!(!((controlGearShift==1 || controlGearShift==2 || controlGearShift==3 || controlGearShift==4)))->
+				::!(controlGearShift!=1 && controlGearShift!=2 && controlGearShift!=3 && controlGearShift!=4)->
 
 					if
 						::gearHandle==0-> ex_Lasts_1=1; cont_lasts_1=0;
@@ -777,6 +777,9 @@ atomic{
 
 					ex_Lasts_2=1; cont_lasts_2 = 0;
 
+				::(controlGearShift!=1 && controlGearShift!=2 && controlGearShift!=3 && controlGearShift!=4)->skip;
+
+			fi;
 			if
 				::!(controlGearShift!=1)->
 
@@ -827,9 +830,6 @@ atomic{
 					od;
 
 				::(controlGearShift!=4)->skip;
-
-			fi;
-				::(!((controlGearShift==1 || controlGearShift==2 || controlGearShift==3 || controlGearShift==4)))->skip;
 
 			fi;
 	fi;
