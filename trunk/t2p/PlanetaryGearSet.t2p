@@ -25,7 +25,7 @@ axioms
 		(actualGear=first & gearShift=shiftOneUp -> Lasts_ei(gearShift=noEvent, singleGearShiftDelay) & Futr(actualGear=second, singleGearShiftDelay)) &	
 		(actualGear=first & gearShift=shiftTwoUp -> Lasts_ei(gearShift=noEvent, dualGearShiftDelay) & Futr(actualGear=third, dualGearShiftDelay)) &
 		(actualGear=first & gearShift=shiftPark -> Lasts_ei(gearShift=noEvent, parkGearShiftDelay) & Futr(actualGear=park, parkGearShiftDelay)) &
-		(actualGear=first & gearShift=shiftReverse -> Lasts_ei(gearShift=noEvent, reverseGearShiftDelay) & Futr(actualGear=third, reverseGearShiftDelay));
+		(actualGear=first & gearShift=shiftReverse -> Lasts_ei(gearShift=noEvent, reverseGearShiftDelay) & Futr(actualGear=reverse, reverseGearShiftDelay));
 		
 	GearShiftSecond:
 		(actualGear=second -> gearShift=noEvent | gearShift=shiftOneUp | gearShift=shiftOneDown) &
