@@ -6,5 +6,5 @@ actualGear = First and controlGearShift (1, Up) implies Futr (actualGear = Secon
 \end{lstlisting}
 
 \begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 2,label=Code:Property2]
-gear = Park and gearHandle (gear) and Futr (actualGear = Park, fluidPropagationDelay + parkGearShiftDelay) implies NowOn (transmissionShaftState = Detached, fluidPropagationDelay + parkGearShiftDelay)
+gear = Park and gearHandle (gear) and Futr (actualGear = Park, fluidPropagationDelay + parkGearShiftDelay) implies NowOn (transmissionShaftState = Detached)
 \end{lstlisting}
