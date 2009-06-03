@@ -2,9 +2,13 @@
 \label{Section:Properties}
 
 \begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 1,label=Code:Property1]
-actualGear = First and controlGearShift (1, Up) implies Futr (actualGear = Second, fluidPropagationDelay + singleGearShiftDelay)
+actualGear=First & controlGearShift=TCUOneUp & not Futr(actualGear=Second, FluidPropagationDelay+SingleGearShiftDelay);
 \end{lstlisting}
 
 \begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 2,label=Code:Property2]
-gear = Park and gearHandle (gear) and Futr (actualGear = Park, fluidPropagationDelay + parkGearShiftDelay) implies NowOn (transmissionShaftState = Detached)
+actualGear=First & gearHandle=HandleReverse & (not Futr(actualGear=Reverse, FluidPropagationDelay+ReverseGearShiftDelay) | not Lasts(transmissionShaftState=Detached, FluidPropagationDelay+ReverseGearShiftDelay));
+\end{lstlisting}
+
+\begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 3,label=Code:Property3]
+actualGear=First & gearHandle=HandlePark & (not Futr(actualGear=Park, FluidPropagationDelay+ParkGearShiftDelay) | not Since(transmissionShaftState=Detached, controlGearShift<>Nothing | gearHandle<>Nothing));
 \end{lstlisting}
