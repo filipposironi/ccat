@@ -224,6 +224,8 @@
 	)
 )
 
+
+
 ;actualGear=First & controlGearShift=TCUOneUp & not Futr(actualGear=Second, FluidPropagationDelay+SingleGearShiftDelay);
 ;actualGear=First & gearHandle=HandleReverse & (not Futr(actualGear=Reverse, FluidPropagationDelay+ReverseGearShiftDelay) | not Lasts(transmissionShaftState=Detached, FluidPropagationDelay+ReverseGearShiftDelay));
 ;actualGear=First & gearHandle=HandlePark & (not Futr(actualGear=Park, FluidPropagationDelay+ParkGearShiftDelay) | not Since(transmissionShaftState=Detached, controlGearShift<>Nothing | gearHandle<>Nothing));
@@ -238,8 +240,36 @@
 			GearShiftSecond
 			GearShiftPark
 			GearShiftReverse
+			
+			;;;;;;;;;; PROPERTY 1 ;;;;;;;;;;;;;;
+			;(!!(->	(&&(actualGear-is First) (controlGearShift-is TCUOneUp)) 
+			;	(Futr(actualGear-is Second) (+ FluidPropagationDelay SingleGearShiftDelay))))
+			
+			;;;;;;;;;; PROPERTY 2 ;;;;;;;;;;;;;;
+			;(!!(-> 	(&& (actualGear-is First) (gearHandle-is HandleReverse))
+			;(&& (Futr(actualGear-is Reverse) (+ FluidPropagationDelay ReverseGearShiftDelay)) (Lasts(transmissionShaftState-is Detached) (+ 				;FluidPropagationDelay ReverseGearShiftDelay) )
+			;)
+			;))
+
+			;;;;;;;;;; PROPERTY 3 ;;;;;;;;;;;;;;
+			(!!
+			
+				(->	(&&(actualGear-is First)(gearHandle-is HandlePark))
+					(&&	(Futr(actualGear-is Park) (+ FluidPropagationDelay ParkGearShiftDelay)) 
+						(Since(transmissionShaftState-is Detached) (!!(gearHandle-is Nothing)) 
+						)
+					)			
+				)
+			
+			)
+			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 		)
 	)
 )
 
-; (bezot:zot 10 CCAT)
+
+
+
+(bezot:zot 10 CCAT)
