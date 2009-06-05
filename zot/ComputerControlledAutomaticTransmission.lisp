@@ -1,19 +1,15 @@
-;CCAT
-
 (asdf:operate 'asdf:load-op 'bezot)
 (use-package :trio-utils)
 
+; Constants
+(defvar Nothing 0)
 
-;Constants
+(defvar TCUShiftOneUp 1)
+(defvar TCUShiftOneDown 2)
 
-(defvar noEvent 0)
 (defvar HandleDrive 1)
 (defvar HandlePark 2)
 (defvar HandleReverse 3)
-
-(defvar TCUOneUp 1)
-(defvar TCUOneDown 2)
-
 
 (defvar ShiftOneUp 1)
 (defvar ShiftOneDown 2)
@@ -21,222 +17,298 @@
 (defvar ShiftPark 4)
 (defvar ShiftReverse 5)
 
-(defvar FluidPropagationDelay 1)
-
-(defvar SingleGearShiftDelay 2)
-(defvar DriveGearShiftDelay 3)
-(defvar ParkGearShiftDelay 3)
-(defvar ReverseGearShiftDelay 3)
-
 (defvar First 0)
 (defvar Second 1)
 (defvar Park 2)
-(defvar Reverse 3) 
+(defvar Reverse 3)
 
-(defvar GearHandleDomain (loop for i from 0 to 3 collect i))
+(defvar Detached 0)
+(defvar Attached 1)
+
+(defvar FluidDelay 1)
+(defvar ShiftDelay 1)
+
+; Domains
 (defvar ControlGearShiftDomain (loop for i from 0 to 2 collect i))
+(defvar GearHandleDomain (loop for i from 0 to 3 collect i))
 (defvar GearShiftDomain (loop for i from 0 to 5 collect i))
 (defvar ActualGearDomain (loop for i from 0 to 3 collect i))
+(defvar TransmissionShaftStateDomain (loop for i from 0 to 1 collect i))
 
-(define-variable GearHandle GearHandleDomain)
-(define-variable ControlGearShift ControlGearShiftDomain)
-(define-variable GearShift GearShiftDomain)
-(define-variable ActualGear ActualGearDomain)
+; Variables
+(define-variable controlGearShift ControlGearShiftDomain)
+(define-variable gearHandle GearHandleDomain)
+(define-variable gearShift GearShiftDomain)
+(define-variable actualGear ActualGearDomain)
+(define-variable transmissionShaftState TransmissionShaftStateDomain)
 
-;Axioms
-;HS
-	;initial condition
- 	(defvar init
-  		(ActualGear-is First)
-	)
-
-
-
-	(defvar GearHandleCommand
-	(->	(!!(GearHandle-is noEvent))
-    	 	(&& 
-			(->	(GearHandle-is HandleDrive)
-				(&&
-					(Lasts_ii(&&	(ControlGearShift-is noEvent)
-							(!!(-P- transmissionShaftState))
-						) FluidPropagationDelay)
-					(Lasts(GearHandle-is noEvent) FluidPropagationDelay)
-					(Futr(GearShift-is ShiftDrive) FluidPropagationDelay)
-				)
-			)
-			(->	(GearHandle-is HandlePark)
-				(&&
-					(Lasts_ii(&&(ControlGearShift-is noEvent)(!!(-P- transmissionShaftState))) FluidPropagationDelay)
-					(Lasts(GearHandle-is noEvent) FluidPropagationDelay)
-					(Futr(GearShift-is ShiftPark) FluidPropagationDelay)
-				)
-			)
-			(->	(GearHandle-is HandleReverse)
-				(&&
-					(Lasts_ii(&&(ControlGearShift-is noEvent)(!!(-P- transmissionShaftState))) FluidPropagationDelay)
-					(Lasts(GearHandle-is noEvent) FluidPropagationDelay)
-					(Futr(GearShift-is ShiftReverse) FluidPropagationDelay)
-				)
+; Axioms
+(defvar ControlGearShiftMutualExclusion
+	(&&
+		(-E- x '(0 1 2) (-P- controlGearShift x))
+		(-A- x '(0 1 2)
+			(->
+				(-P- controlGearShift x)
+				(-A- y '(0 1 2) (->	(!! (= x y)) (!! (-P- controlGearShift y))))
 			)
 		)
 	)
-	)
-
-
-
-	(defvar PropagateGearShiftCommand
-	(->	(!!(ControlGearShift-is noEvent))
-		(->
-			(||	(ControlGearShift-is TCUOneUp)
-				(ControlGearShift-is TCUOneDown)
-			)
-			(&&
-				(Lasts_ei(ControlGearShift-is noEvent) FluidPropagationDelay)	
-				(Lasts_ii(GearHandle-is noEvent) FluidPropagationDelay)
-				(->	(ControlGearShift-is TCUOneUp)
-					(Futr(GearShift-is ShiftOneUp) FluidPropagationDelay)
-				)
-				(->	(ControlGearShift-is TCUOneDown)
-					(Futr(GearShift-is ShiftOneDown) FluidPropagationDelay)
-				)
-
-			)
-		)	
-	)
-	)
-
-
-;PGS
-
-	
-	(defvar Mechanics
-		(->	(!!(GearShift-is noEvent)) 
-			(&&	(->(GearShift-is ShiftOneUp)( -P- transmissionShaftState))
-				(->(GearShift-is ShiftDrive)(!!( -P- transmissionShaftState)))
-			 	(->(GearShift-is ShiftPark) (!!( -P- transmissionShaftState)))
-				(->(GearShift-is ShiftReverse) (!!( -P- transmissionShaftState)))
-	
-				(->( -P- transmissionShaftState) (||(ActualGear-is First) (ActualGear-is Second)(ActualGear-is 									Reverse))
-				)
-			)
-		)
-	
-	)
-
-	
-
-
-	(defvar GearShiftFirst
-		(&&	(->	(ActualGear-is First)
-				(||(GearShift-is noEvent)(GearShift-is ShiftOneUp)(GearShift-is ShiftPark)(GearShift-is ShiftReverse))
-			)
-			(->	(&&(ActualGear-is First)(GearShift-is ShiftOneUp))
-				(&&(Lasts_ei(GearShift-is noEvent) SingleGearShiftDelay)(Futr(ActualGear-is Second)  					SingleGearShiftDelay))
-			)
-			(->	(&&(ActualGear-is First)(GearShift-is ShiftPark))
-				(&&(Lasts_ii(!!(-P- transmissionShaftState) ParkGearShiftDelay))(Lasts_ei(GearShift-is noEvent) ParkGearShiftDelay)(Futr(ActualGear-is Park)  					ParkGearShiftDelay))
-			)
-			(->	(&&(ActualGear-is First)(GearShift-is ShiftReverse))
-				(&&(Lasts_ii(!!(-P- transmissionShaftState) ReverseGearShiftDelay))(Lasts_ei(GearShift-is noEvent) ReverseGearShiftDelay)(Futr(ActualGear-is Reverse)  					ReverseGearShiftDelay))
-			)
-		)
-	)
-
-
-
-
-	(defvar GearShiftSecond
-		(&&	(->	(ActualGear-is Second)
-				(||(GearShift-is noEvent)(GearShift-is ShiftOneDown))
-			)
-			(->	(&&(ActualGear-is Second)(GearShift-is ShiftOneDown))
-				(&&(Lasts_ei(GearShift-is noEvent) SingleGearShiftDelay)(Futr(ActualGear-is First)  					SingleGearShiftDelay))
-			)
-		)
-	)
-
-
-
-	(defvar GearShiftReverse
-	(->	(!!(GearShift-is noEvent))
-		(&&	(->	(ActualGear-is Reverse)
-				(||(GearShift-is noEvent)(GearShift-is ShiftDrive)(GearShift-is ShiftPark))
-			)
-			(->	(&&(ActualGear-is Reverse)(GearShift-is ShiftDrive))
-				(&&	(Lasts_ii(!!(-P- transmissionShaftState)) DriveGearShiftDelay)
-					(Lasts_ei(GearShift-is noEvent) DriveGearShiftDelay)
-					(Futr(ActualGear-is First) DriveGearShiftDelay)
-				)
-			)
-			(->	(&&(ActualGear-is Reverse)(GearShift-is ShiftPark))
-				(&&	(Lasts_ii(!!(-P- transmissionShaftState)) ParkGearShiftDelay)
-					(Lasts_ei(GearShift-is noEvent) ParkGearShiftDelay)
-					(Futr(ActualGear-is Park) ParkGearShiftDelay)
-				)
-			)
-			
-		)
-	)
-	)
-
-
-	(defvar GearShiftPark
-		(&&	(->	(ActualGear-is Park)
-				(!! (-P- transmissionShaftState))
-			)
-			(->	(ActualGear-is Park)
-				(||(GearShift-is noEvent)(GearShift-is ShiftDrive)(GearShift-is ShiftReverse))
-			)
-			(->	(&&(ActualGear-is Park)(GearShift-is ShiftDrive))
-				(&&(Lasts_ii(!!(-P- transmissionShaftState)) DriveGearShiftDelay)(Lasts_ei(GearShift-is noEvent) DriveGearShiftDelay)(Futr(ActualGear-is First)  					DriveGearShiftDelay))
-			)
-			(->	(&&(ActualGear-is Park)(GearShift-is ShiftReverse))
-				(&&(Lasts_ii(!!(-P- transmissionShaftState)) ReverseGearShiftDelay)(Lasts_ei(GearShift-is noEvent) ReverseGearShiftDelay)(Futr(ActualGear-is Reverse)  					ReverseGearShiftDelay))
-			)
-			
-		)
-	)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	;non funziona
-	(defvar prop
-	(->	(&&(ActualGear-is First)(gearHandle-is HandleReverse))
-			(&&(Futr(ActualGear-is Reverse) (+ FluidPropagationDelay ReverseGearShiftDelay))
-			(Lasts(!!(-P- transmissionShaftState)) (+ FluidPropagationDelay ReverseGearShiftDelay)))
-		
-
-	)
-	)
-
-	;non funziona
-	(defvar prop2
-		(->	(ActualGear-is Second)
-				(Past(ActualGear-is First) (+ FluidPropagationDelay SingleGearShiftDelay))
-		)
-	) 
-	
-	; funziona
-	(defvar prop3
-		(->	(ActualGear-is Park)
-				(Past(||(ActualGear-is First)(ActualGear-is Reverse)) FluidPropagationDelay)
-		)
-		
-			
-	) 
-	
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;theorem proof
-(bezot:zot 10
-  
-		(&&(yesterday init)(!! prop3))	
-
-	
 )
 
+(defvar GearHandleMutualExclusion
+	(&&
+		(-E- x '(0 1 2 3) (-P- gearHandle x))
+		(-A- x '(0 1 2 3)
+			(->
+				(-P- gearHandle x)
+				(-A- y '(0 1 2 3) (->	(!! (= x y)) (!! (-P- gearHandle y))))
+			)
+		)
+	)
+)
 
+(defvar GearShiftMutualExclusion
+	(&&
+		(-E- x '(0 1 2 3 4 5) (-P- gearShift x))
+		(-A- x '(0 1 2 3 4 5)
+			(->
+				(-P- gearShift x)
+				(-A- y '(0 1 2 3 4 5) (->	(!! (= x y)) (!! (-P- gearShift y))))
+			)
+		)
+	)
+)
 
+(defvar ActualGearMutualExclusion
+	(&&
+		(-E- x '(0 1 2 3) (-P- actualGear x))
+		(-A- x '(0 1 2 3)
+			(->
+				(-P- actualGear x)
+				(-A- y '(0 1 2 3) (->	(!! (= x y)) (!! (-P- actualGear y))))
+			)
+		)
+	)
+)
 
+(defvar TransmissionShaftStateMutualExclusion
+	(&&
+		(-E- x '(0 1) (-P- transmissionShaftState x))
+		(-A- x '(0 1)
+			(->
+				(-P- transmissionShaftState x)
+				(-A- y '(0 1) (->	(!! (= x y)) (!! (-P- transmissionShaftState y))))
+			)
+		)
+	)
+)
+
+(defvar Mechanic
+	(&&
+		(->
+			(actualGear-is First)
+			(||
+				(gearShift-is Nothing)
+				(gearShift-is ShiftOneUp)
+				(gearShift-is ShiftPark)
+				(gearShift-is ShiftReverse)
+			)
+		)
+		(->
+			(actualGear-is Second)
+			(|| (gearShift-is Nothing) (gearShift-is ShiftOneDown))
+		)
+		(->
+			(actualGear-is Park)
+			(||	(gearShift-is Nothing) (gearShift-is ShiftDrive) (gearShift-is ShiftReverse))
+		)
+		(->
+			(actualGear-is Reverse)
+			(||	(gearShift-is Nothing) (gearShift-is ShiftDrive) (gearShift-is ShiftPark))
+		)
+		(->	(gearShift-is ShiftOneUp) (transmissionShaftState-is Attached))
+		(->
+			(||
+				(gearShift-is ShiftDrive)
+				(gearShift-is ShiftPark)
+				(gearShift-is ShiftReverse)
+			)
+			(transmissionShaftState-is Detached)
+		)
+		(->
+			(transmissionShaftState-is Attached)
+			(|| (actualGear-is First) (actualGear-is Second) (actualGear-is Reverse))
+		)
+		(-> (actualGear-is Park) (transmissionShaftState-is Detached))
+	)
+)
+
+(defvar GearShiftCommand
+	(&&
+		(->
+			(controlGearShift-is TCUShiftOneUp)
+			(Futr (gearShift-is ShiftOneUp) FluidDelay)
+		)
+		(->
+			(controlGearShift-is TCUShiftOneDown)
+			(Futr (gearShift-is ShiftOneDown) FluidDelay)
+		)
+	)
+)
+
+(defvar GearHandleCommand
+	(&& 
+		(->
+			(gearHandle-is HandleDrive)
+			(&&
+				(Lasts_ii (&& (controlGearShift-is Nothing) (transmissionShaftState-is Detached)) FluidDelay)
+				(Lasts_ei (gearHandle-is Nothing) FluidDelay)
+				(Futr (gearShift-is ShiftDrive) FluidDelay)
+			)
+		)
+		(->
+			(gearHandle-is HandlePark)
+			(&&
+				(Lasts_ii (&& (controlGearShift-is Nothing) (transmissionShaftState-is Detached)) FluidDelay)
+				(Lasts_ei (gearHandle-is Nothing) FluidDelay)
+				(Futr (gearShift-is ShiftPark) FluidDelay)
+			)
+		)
+		(->
+			(gearHandle-is HandleReverse)
+			(&&
+				(Lasts_ii (&& (controlGearShift-is Nothing) (transmissionShaftState-is Detached)) FluidDelay)
+				(Lasts_ei (gearHandle-is Nothing) FluidDelay)
+				(Futr (gearShift-is ShiftReverse) FluidDelay)
+			)
+		)
+	)
+)
+
+(defvar GearShiftFirst
+	(&&
+		(->
+			(&& (actualGear-is First) (gearShift-is ShiftOneUp))
+			(&&
+				(Lasts_ei (gearShift-is Nothing) ShiftDelay)
+				(Futr (actualGear-is Second) ShiftDelay)
+			)
+		)
+		(->
+			(&& (actualGear-is First) (gearShift-is ShiftPark))
+			(&&
+				(Lasts_ii (transmissionShaftState-is Detached) ShiftDelay)
+				(Lasts_ei (gearShift-is Nothing) ShiftDelay)
+				(Futr (actualGear-is Park) ShiftDelay)
+			)
+		)
+		(->
+			(&& (actualGear-is First) (gearShift-is ShiftReverse))
+			(&&
+				(Lasts_ii (transmissionShaftState-is Detached) ShiftDelay)
+				(Lasts_ei (gearShift-is Nothing) ShiftDelay)
+				(Futr (actualGear-is Reverse) ShiftDelay)
+			)
+		)
+	)
+)
+
+(defvar GearShiftSecond
+	(->
+		(&& (actualGear-is Second) (gearShift-is ShiftOneDown))
+		(&&
+			(Lasts_ei (gearShift-is Nothing) ShiftDelay)
+			(Futr (actualGear-is First) ShiftDelay)
+		)
+	)
+)
+
+(defvar GearShiftPark
+	(&&
+		(->
+			(&& (actualGear-is Park) (gearShift-is ShiftDrive))
+			(&&
+				(Lasts_ii (transmissionShaftState-is Detached) ShiftDelay)
+				(Lasts_ei (gearShift-is Nothing) ShiftDelay)
+				(Futr (actualGear-is First) ShiftDelay)
+			)
+		)
+		(->
+			(&& (actualGear-is Park) (gearShift-is ShiftReverse))
+			(&&
+				(Lasts_ii (transmissionShaftState-is Detached) ShiftDelay)
+				(Lasts_ei (gearShift-is Nothing) ShiftDelay)
+				(Futr (actualGear-is Reverse) ShiftDelay)
+			)
+		)
+	)
+)
+
+(defvar GearShiftReverse
+	(&&
+		(->
+			(&& (actualGear-is Reverse) (gearShift-is ShiftDrive))
+			(&&
+				(Lasts_ii (transmissionShaftState-is Detached) ShiftDelay)
+				(Lasts_ei (gearShift-is Nothing) ShiftDelay)
+				(Futr (actualGear-is First) ShiftDelay)
+			)
+		)
+		(->
+			(&& (actualGear-is Reverse) (gearShift-is ShiftPark))
+			(&&
+				(Lasts_ii (transmissionShaftState-is Detached) ShiftDelay)
+				(Lasts_ei (gearShift-is Nothing) ShiftDelay)
+				(Futr (actualGear-is Park) ShiftDelay)
+			)
+		)
+	)
+)
+
+(defvar CCAT
+	(Alw
+		(&&
+			ControlGearShiftMutualExclusion
+			GearHandleMutualExclusion
+			GearShiftMutualExclusion
+			ActualGearMutualExclusion
+			TransmissionShaftStateMutualExclusion
+			Mechanic
+			GearShiftCommand
+			GearHandleCommand
+			GearShiftFirst
+			GearShiftSecond
+			GearShiftPark
+			GearShiftReverse
+			;;;;;;;;;; PROPERTY 1 ;;;;;;;;;;;;;;
+;			(!!
+;				(->
+;					(&& (actualGear-is First) (controlGearShift-is TCUShiftOneUp)) 
+;					(Futr (actualGear-is Second) (+ FluidDelay ShiftDelay))
+;				)
+;			)
+			;;;;;;;;;; PROPERTY 2 ;;;;;;;;;;;;;;
+;			(!!
+;				(->
+;					(&& (actualGear-is First) (gearHandle-is HandleReverse))
+;					(&&
+;						(Futr (actualGear-is Reverse) (+ FluidDelay ShiftDelay))
+;						(Lasts_ii (transmissionShaftState-is Detached) (+ FluidDelay ShiftDelay))
+;					)
+;				)
+;			)
+			;;;;;;;;;; PROPERTY 3 ;;;;;;;;;;;;;;
+;			(!!
+;				(->
+;					(&& (actualGear-is First) (gearHandle-is HandlePark))
+;					(&&
+;						(Futr (actualGear-is Park) (+ FluidDelay ShiftDelay)) 
+;						(Since (transmissionShaftState-is Detached) (!! (gearHandle-is Nothing)))
+;					)
+;				)			
+;			)
+		)
+	)
+)
+
+(bezot:zot 10 CCAT)
