@@ -140,6 +140,19 @@
 			(|| (actualGear-is First) (actualGear-is Second) (actualGear-is Reverse))
 		)
 		(-> (actualGear-is Park) (transmissionShaftState-is Detached))
+		(->
+			(&&
+				(controlGearShift-is Nothing)
+				(gearHandle-is Nothing)
+			)
+			(Futr (gearShift-is Nothing) FluidDelay)
+		)
+		(-A- x '(0 1 2 3)
+			(->
+				(&& (-P- actualGear x) (gearShift-is Nothing))
+				(Lasts_ii (-P- actualGear x) ShiftDelay)
+			)
+		)
 	)
 )
 
@@ -265,7 +278,7 @@
 	)
 )
 
-(defvar CCAT
+(defvar ComputerControlledAutomaticTransmission
 	(Alw
 		(&&
 			ControlGearShiftMutualExclusion
@@ -280,35 +293,38 @@
 			GearShiftSecond
 			GearShiftPark
 			GearShiftReverse
-			;;;;;;;;;; PROPERTY 1 ;;;;;;;;;;;;;;
-;			(!!
-;				(->
-;					(&& (actualGear-is First) (controlGearShift-is TCUShiftOneUp)) 
-;					(Futr (actualGear-is Second) (+ FluidDelay ShiftDelay))
-;				)
-;			)
-			;;;;;;;;;; PROPERTY 2 ;;;;;;;;;;;;;;
-;			(!!
-;				(->
-;					(&& (actualGear-is First) (gearHandle-is HandleReverse))
-;					(&&
-;						(Futr (actualGear-is Reverse) (+ FluidDelay ShiftDelay))
-;						(Lasts_ii (transmissionShaftState-is Detached) (+ FluidDelay ShiftDelay))
-;					)
-;				)
-;			)
-			;;;;;;;;;; PROPERTY 3 ;;;;;;;;;;;;;;
-;			(!!
-;				(->
-;					(&& (actualGear-is First) (gearHandle-is HandlePark))
-;					(&&
-;						(Futr (actualGear-is Park) (+ FluidDelay ShiftDelay)) 
-;						(Since (transmissionShaftState-is Detached) (!! (gearHandle-is Nothing)))
-;					)
-;				)			
-;			)
 		)
 	)
 )
 
-(bezot:zot 10 CCAT)
+(defvar PropertyOne
+	(->
+		(&& (actualGear-is First) (controlGearShift-is TCUShiftOneUp)) 
+		(Futr (actualGear-is Second) (+ FluidDelay ShiftDelay))
+	)
+)
+
+(defvar PropertyTwo
+	(->
+		(&& (actualGear-is First) (gearHandle-is HandleReverse))
+		(&&
+			(Futr (actualGear-is Reverse) (+ FluidDelay ShiftDelay))
+			(Lasts_ii (transmissionShaftState-is Detached) (+ FluidDelay ShiftDelay))
+		)
+	)
+)
+
+(defvar PropertyThree
+	(->
+		(&& (actualGear-is First) (gearHandle-is HandlePark))
+		(&&
+			(Futr (actualGear-is Park) (+ FluidDelay ShiftDelay)) 
+			(Since (transmissionShaftState-is Detached) (!! (gearHandle-is Nothing)))
+		)
+	)			
+)
+
+(bezot:zot 50 ComputerControlledAutomaticTransmission)
+(bezot:zot 50 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyOne))))
+(bezot:zot 50 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyTwo))))
+(bezot:zot 50 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyThree))))
