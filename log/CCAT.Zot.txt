@@ -1,0 +1,275 @@
+
+C:\winzot>zot.bat workspace\CCAT\ComputerControlledAutomaticTransmission.lisp
+;; Loading file .clisprc.lisp ...
+;;  Loading file C:\winzot\clisp\asdf.fas ...
+;;  Loaded file C:\winzot\clisp\asdf.fas
+;; Loaded file .clisprc.lisp
+; loading system definition from clisp\asdfs\bezot.asd into #<PACKAGE ASDF0>
+; registering #<SYSTEM BEZOT #x19EEE999> as BEZOT
+0 errors, 0 warnings
+This is BeZot, v. 20080321
+
+Used propositions:
+(CONTROLGEARSHIFT_0 CONTROLGEARSHIFT_1 CONTROLGEARSHIFT_2 GEARHANDLE_0
+ GEARHANDLE_1 GEARHANDLE_2 GEARHANDLE_3 GEARSHIFT_0 GEARSHIFT_1 GEARSHIFT_2
+ GEARSHIFT_3 GEARSHIFT_4 GEARSHIFT_5 ACTUALGEAR_0 ACTUALGEAR_1 ACTUALGEAR_2
+ ACTUALGEAR_3 TRANSMISSIONSHAFTSTATE_0 TRANSMISSIONSHAFTSTATE_1)
+
+Time bound: 20
+loopconstraints...poolconstraints...gen-bool...lastState...firstState...gen-futr
+...gen-evt-futr...gen-past...gen-evt-past...stabilize-past...stabilize-futr...
+done processing formula
+Real time: 0.65625 sec.
+Run time: 0.65625 sec.
+Space: 5852612 Bytes
+GC: 7, GC time: 0.265625 sec.
+translating into SAT...
+Real time: 1.984375 sec.
+Run time: 1.953125 sec.
+Space: 30946072 Bytes
+GC: 26, GC time: 0.359375 sec.
+calling SAT2CNF...using tmpdir: /cygdrive/c/DOCUME~1/FILIPP~1/LOCALS~1/Temp/
+in readSAT
+Root node ID: 81682
+determining var usage...
+*
+*
+*
+*
+*
+*
+*
+*
+grounding out...
+*
+*
+*
+*
+*
+*
+*
+*
+*
+grounded out.
+done reading SAT file.
+simplifying ...
+*
+*
+*
+*
+*
+*
+*
+*
+*
+writing out template instantiations...
+*
+*
+*
+*
+*
+*
+*
+*
+added instantiations of TRUE and FALSE
+wrote out template instantiations.
+finding usage...
+*
+*
+*
+*
+*
+*
+*
+*
+*
+writing CNF...
+*
+*
+*
+*
+wrote cnf.
+228303 clauses
+writing final cnf
+p cnf 74643 228304
+Wrote 775746 literals.
+cnfdag in /cygdrive/c/DOCUME~1/FILIPP~1/LOCALS~1/Temp//cnfdag.cnf
+
+Real time: 11.703125 sec.
+Run time: 0.0 sec.
+Space: 0 Bytes
+This was sat2cnf. Solver time coming next.
+==================================[MINISAT]===================================
+| Conflicts |     ORIGINAL     |              LEARNT              | Progress |
+|           | Clauses Literals |   Limit Clauses Literals  Lit/Cl |          |
+==============================================================================
+|         0 |  158867   497001 |   52955       0        0     nan |  0.000 % |
+|       101 |  158902   497001 |   58250      66      357     5.4 | 45.789 % |
+|       251 |  158938   497001 |   64075     178      973     5.5 | 45.898 % |
+|       476 |  158802   496641 |   70483     348     1991     5.7 | 45.953 % |
+|       813 |  158849   496641 |   77531     638     4115     6.4 | 45.953 % |
+==============================================================================
+restarts              : 5
+conflicts             : 893            (689 /sec)
+decisions             : 4178           (3224 /sec)
+propagations          : 3323154        (2564162 /sec)
+conflict literals     : 4615           (10.04 % deleted)
+Memory used           : 205.81 MB
+CPU time              : 1.296 s
+
+SATISFIABLE
+Real time: 1.453125 sec.
+Run time: 0.0 sec.
+Space: 0 Bytes
+------ time 0 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_1
+  GEARSHIFT_0
+  ACTUALGEAR_3
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 1 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_3
+  ACTUALGEAR_3
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 2 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_3
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 3 ------
+  **POOL**
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_5
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 4 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_1
+  GEARSHIFT_0
+  ACTUALGEAR_3
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 5 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_3
+  ACTUALGEAR_3
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 6 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 7 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 8 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 9 ------
+  CONTROLGEARSHIFT_1
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 10 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_1
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 11 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_1
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 12 ------
+  CONTROLGEARSHIFT_2
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_1
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 13 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_2
+  ACTUALGEAR_1
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 14 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 15 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 16 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_1
+
+------ time 17 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_2
+  GEARSHIFT_0
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 18 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_4
+  ACTUALGEAR_0
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 19 ------
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_2
+  TRANSMISSIONSHAFTSTATE_0
+
+------ time 20 ------
+  **LOOP**
+  CONTROLGEARSHIFT_0
+  GEARHANDLE_0
+  GEARSHIFT_0
+  ACTUALGEAR_2
+  TRANSMISSIONSHAFTSTATE_0
+
+------ end ------
+
+C:\winzot>

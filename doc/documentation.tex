@@ -46,6 +46,18 @@ morecomment=[s][\color{green}]{/*}{*/},
 morecomment=[l][\color{green}]//,
 sensitive
 }
+%%
+%% Zot definition
+%%
+\lstdefinelanguage{Zot}{
+morekeywords=[0]{defvar,loop,collect,for,from,to,define-variable,bezot,zot,asdf,operate,load-op,use-package},
+keywordstyle=[0]\color{violet}\bfseries,
+morekeywords=[1]{-A-,-E-,-P-},
+keywordstyle=[1]\color{blue}\bfseries,
+morekeywords=[2]{Futr,Lasts_ii,Lasts_ei,Until,Alw},
+keywordstyle=[2]\color{blue},
+morecomment=[l][\color{green}];
+}[keywords,comments]
 
 \begin{document}
 
@@ -58,7 +70,7 @@ sensitive
 \end{center}
 \vskip 9cm
 \begin{center}
-{\Large Computer Controller Automatic Transmission\\(Mandatory Part and Optional Part not complete yet)}
+{\Large Computer Controller Automatic Transmission\\(Mandatory Part and Optional Part)}
 \end{center}
 \vskip 2cm
 \begin{center}

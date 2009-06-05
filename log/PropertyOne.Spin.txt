@@ -1,0 +1,108 @@
+warning: for p.o. reduction to be valid the never claim must be stutter-invariant
+(never claims generated from LTL formulae are stutter-invariant)
+depth 0: Claim reached state 5 (line 444)
+depth 0: Claim reached state 5 (line 445)
+depth 253: Claim reached state 9 (line 449)
+depth 251: Claim reached state 9 (line 448)
+(Spin Version 4.3.0 -- 22 June 2007)
+	+ Partial Order Reduction
+	+ Compression
+
+Full statespace search for:
+	never claim         	+
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 76 byte, depth reached 1114, errors: 0
+    2676 states, stored
+     675 states, matched
+    3351 transitions (= stored+matched)
+    3762 atomic steps
+hash conflicts: 0 (resolved)
+
+Stats on memory usage (in Megabytes):
+0.246 	equivalent memory usage for states (stored*(State-vector + overhead))
+0.364 	actual memory usage for states (unsuccessful compression: 147.74%)
+	State-vector as stored = 120 byte + 16 byte overhead
+2.097 	memory used for hash table (-w19)
+0.320 	memory used for DFS stack (-m10000)
+0.057 	memory lost to fragmentation
+2.724 	total actual memory usage
+
+nr of templates: [ globals chans procs ]
+collapse counts: [ 137 8 8 2 2 463 2 2 ]
+unreached in proctype Futr_1
+	line 20, "pan.___", state 14, "msg!1,0,proc"
+	line 25, "pan.___", state 23, "-end-"
+	(2 of 23 states)
+unreached in proctype Futr_2
+	line 39, "pan.___", state 14, "msg!1,0,proc"
+	line 44, "pan.___", state 23, "-end-"
+	(2 of 23 states)
+unreached in proctype Futr_3
+	line 56, "pan.___", state 7, "i = 0"
+	line 56, "pan.___", state 8, "msg!1,1,proc"
+	line 57, "pan.___", state 10, "i = 0"
+	line 57, "pan.___", state 11, "msg!0,1,proc"
+	line 58, "pan.___", state 14, "msg!1,0,proc"
+	line 55, "pan.___", state 15, "(((i==0)&&(actualGear==1)))"
+	line 55, "pan.___", state 15, "(((i==0)&&!((actualGear==1))))"
+	line 55, "pan.___", state 15, "((i<0))"
+	line 52, "pan.___", state 17, "(!(val1))"
+	line 52, "pan.___", state 17, "(val1)"
+	line 63, "pan.___", state 23, "-end-"
+	(8 of 23 states)
+unreached in proctype Futr_4
+	line 75, "pan.___", state 7, "i = 0"
+	line 75, "pan.___", state 8, "msg!1,1,proc"
+	line 76, "pan.___", state 10, "i = 0"
+	line 76, "pan.___", state 11, "msg!0,1,proc"
+	line 77, "pan.___", state 14, "msg!1,0,proc"
+	line 74, "pan.___", state 15, "(((i==0)&&(actualGear==0)))"
+	line 74, "pan.___", state 15, "(((i==0)&&!((actualGear==0))))"
+	line 74, "pan.___", state 15, "((i<0))"
+	line 71, "pan.___", state 17, "(!(val1))"
+	line 71, "pan.___", state 17, "(val1)"
+	line 82, "pan.___", state 23, "-end-"
+	(8 of 23 states)
+unreached in proctype spe
+	line 186, "pan.___", state 79, "(1)"
+	line 205, "pan.___", state 107, "(1)"
+	line 245, "pan.___", state 159, "s = 0"
+	line 260, "pan.___", state 178, "s = 0"
+	line 273, "pan.___", state 195, "msg!1,1,proc"
+	line 274, "pan.___", state 196, "msg?value,status,eval(proc)"
+	line 281, "pan.___", state 206, "(1)"
+	line 279, "pan.___", state 207, "(status)"
+	line 279, "pan.___", state 207, "(!(status))"
+	line 301, "pan.___", state 234, "s = 0"
+	line 309, "pan.___", state 243, "msg!1,1,proc"
+	line 310, "pan.___", state 244, "msg?value,status,eval(proc)"
+	line 317, "pan.___", state 254, "(1)"
+	line 315, "pan.___", state 255, "(status)"
+	line 315, "pan.___", state 255, "(!(status))"
+	line 337, "pan.___", state 282, "s = 0"
+	line 370, "pan.___", state 322, "s = 0"
+	line 392, "pan.___", state 345, "i = 0"
+	line 395, "pan.___", state 348, "msg!0,0,proc"
+	line 396, "pan.___", state 349, "i = (i+1)"
+	line 393, "pan.___", state 352, "((i<1))"
+	line 393, "pan.___", state 352, "((i==1))"
+	line 403, "pan.___", state 358, "msg!0,0,proc"
+	line 404, "pan.___", state 359, "i = (i+1)"
+	line 401, "pan.___", state 362, "((i<1))"
+	line 401, "pan.___", state 362, "((i==1))"
+	line 411, "pan.___", state 368, "msg!0,0,proc"
+	line 412, "pan.___", state 369, "i = (i+1)"
+	line 409, "pan.___", state 372, "((i<1))"
+	line 409, "pan.___", state 372, "((i==1))"
+	line 419, "pan.___", state 378, "msg!0,0,proc"
+	line 420, "pan.___", state 379, "i = (i+1)"
+	line 425, "pan.___", state 386, "-end-"
+	(28 of 386 states)
+unreached in proctype :init:
+	(0 of 2 states)
+unreached in proctype :never:
+	line 451, "pan.___", state 11, "-end-"
+	(1 of 11 states)

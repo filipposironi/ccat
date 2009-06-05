@@ -1,0 +1,129 @@
+
+C:\winzot>zot.bat workspace\CCAT\ComputerControlledAutomaticTransmission.lisp
+;; Loading file .clisprc.lisp ...
+;;  Loading file C:\winzot\clisp\asdf.fas ...
+;;  Loaded file C:\winzot\clisp\asdf.fas
+;; Loaded file .clisprc.lisp
+; loading system definition from clisp\asdfs\bezot.asd into #<PACKAGE ASDF0>
+; registering #<SYSTEM BEZOT #x19EEE999> as BEZOT
+0 errors, 0 warnings
+This is BeZot, v. 20080321
+
+Used propositions:
+(CONTROLGEARSHIFT_0 CONTROLGEARSHIFT_1 CONTROLGEARSHIFT_2 GEARHANDLE_0
+ GEARHANDLE_1 GEARHANDLE_2 GEARHANDLE_3 GEARSHIFT_0 GEARSHIFT_1 GEARSHIFT_2
+ GEARSHIFT_3 GEARSHIFT_4 GEARSHIFT_5 ACTUALGEAR_0 ACTUALGEAR_1 ACTUALGEAR_2
+ ACTUALGEAR_3 TRANSMISSIONSHAFTSTATE_0 TRANSMISSIONSHAFTSTATE_1)
+
+Time bound: 20
+loopconstraints...poolconstraints...gen-bool...lastState...firstState...gen-futr
+...gen-evt-futr...gen-past...gen-evt-past...stabilize-past...stabilize-futr...
+done processing formula
+Real time: 0.59375 sec.
+Run time: 0.59375 sec.
+Space: 6310980 Bytes
+GC: 8, GC time: 0.21875 sec.
+translating into SAT...
+Real time: 1.359375 sec.
+Run time: 1.359375 sec.
+Space: 33285304 Bytes
+GC: 19, GC time: 0.125 sec.
+calling SAT2CNF...using tmpdir: /cygdrive/c/DOCUME~1/FILIPP~1/LOCALS~1/Temp/
+in readSAT
+Root node ID: 88352
+determining var usage...
+*
+*
+*
+*
+*
+*
+*
+*
+*
+grounding out...
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+grounded out.
+done reading SAT file.
+simplifying ...
+*
+*
+*
+*
+*
+*
+*
+*
+*
+writing out template instantiations...
+*
+*
+*
+*
+*
+*
+*
+*
+*
+added instantiations of TRUE and FALSE
+wrote out template instantiations.
+finding usage...
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+writing CNF...
+*
+*
+*
+*
+wrote cnf.
+246965 clauses
+writing final cnf
+p cnf 80907 246966
+Wrote 838694 literals.
+cnfdag in /cygdrive/c/DOCUME~1/FILIPP~1/LOCALS~1/Temp//cnfdag.cnf
+
+Real time: 11.96875 sec.
+Run time: 0.0 sec.
+Space: 0 Bytes
+This was sat2cnf. Solver time coming next.
+==================================[MINISAT]===================================
+| Conflicts |     ORIGINAL     |              LEARNT              | Progress |
+|           | Clauses Literals |   Limit Clauses Literals  Lit/Cl |          |
+==============================================================================
+|         0 |  173494   538430 |   57831       0        0     nan |  0.000 % |
+|       100 |  173515   538430 |   63614      77      469     6.1 | 45.068 % |
+|       250 |  173552   538430 |   69975     188     1071     5.7 | 45.130 % |
+|       475 |  173420   538157 |   76973     355     2204     6.2 | 45.230 % |
+==============================================================================
+restarts              : 4
+conflicts             : 624            (579 /sec)
+decisions             : 2648           (2456 /sec)
+propagations          : 1835868        (1703032 /sec)
+conflict literals     : 3375           (12.29 % deleted)
+Memory used           : 211.81 MB
+CPU time              : 1.078 s
+
+UNSATISFIABLE
+Real time: 1.1875 sec.
+Run time: 0.0 sec.
+Space: 0 Bytes
+---------UNSAT---------
+
+C:\winzot>
