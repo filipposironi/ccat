@@ -32,8 +32,8 @@ axioms
 		(gearShift = ShiftDrive | gearShift = ShiftPark | gearShift = ShiftReverse ->
 			transmissionShaftState = Detached
 		) &
-		(transmissionShaftState = Attached -> actualGear = First | actualGear = Second | actualGear = Reverse);
-		(actualGear = Park -> transmissionShaftState = Detached) &
+		(transmissionShaftState = Attached -> actualGear = First | actualGear = Second | actualGear = Reverse) &
+		(actualGear = Park -> transmissionShaftState = Detached);
 	
 	GearShiftCommand:
 		(controlGearShift = TCUShiftOneUp ->

@@ -319,12 +319,12 @@
 		(&& (actualGear-is First) (gearHandle-is HandlePark))
 		(&&
 			(Futr (actualGear-is Park) (+ FluidDelay ShiftDelay)) 
-			(Since (transmissionShaftState-is Detached) (!! (gearHandle-is Nothing)))
+			(Until (transmissionShaftState-is Detached) (!! (gearHandle-is Nothing)))
 		)
 	)			
 )
 
-(bezot:zot 50 ComputerControlledAutomaticTransmission)
-(bezot:zot 50 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyOne))))
-(bezot:zot 50 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyTwo))))
-(bezot:zot 50 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyThree))))
+(bezot:zot 20 ComputerControlledAutomaticTransmission)
+;(bezot:zot 20 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyOne))))
+;(bezot:zot 20 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyTwo))))
+;(bezot:zot 20 (&& ComputerControlledAutomaticTransmission (!! (Alw PropertyThree))))
