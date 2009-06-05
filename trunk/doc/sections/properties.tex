@@ -1,14 +1,15 @@
 \section{Properties}
 \label{Section:Properties}
+In this Section~\ref{Section:Properties} are reported the three properties we have proved in their decidable TRIO form.
 
 \begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 1,label=Code:Property1]
-actualGear=First & controlGearShift=TCUOneUp & not Futr(actualGear=Second, FluidPropagationDelay+SingleGearShiftDelay);
+actualGear = First & controlGearShift = TCUShiftOneUp -> Futr(actualGear = Second, FluidDelay + ShiftDelay);
 \end{lstlisting}
 
 \begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 2,label=Code:Property2]
-actualGear=First & gearHandle=HandleReverse & (not Futr(actualGear=Reverse, FluidPropagationDelay+ReverseGearShiftDelay) | not Lasts(transmissionShaftState=Detached, FluidPropagationDelay+ReverseGearShiftDelay));
+actualGear = First & gearHandle = HandleShiftReverse -> Futr(actualGear = Reverse, FluidDelay + ShiftDelay) & Lasts_ii(transmissionShaftState = Detached, FluidDelay + ShiftDelay));
 \end{lstlisting}
 
 \begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 3,label=Code:Property3]
-actualGear=First & gearHandle=HandlePark & (not Futr(actualGear=Park, FluidPropagationDelay+ParkGearShiftDelay) | not Since(transmissionShaftState=Detached, controlGearShift<>Nothing | gearHandle<>Nothing));
+actualGear = First & gearHandle = HandleShiftPark -> Futr(actualGear = Park, FluidDelay + ShiftDelay) & Until(transmissionShaftState = Detached, gearHandle <> Nothing));
 \end{lstlisting}

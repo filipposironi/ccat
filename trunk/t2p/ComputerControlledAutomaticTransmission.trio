@@ -1,0 +1,109 @@
+variables
+	controlGearShift: [0..2],
+	gearHandle: [0..3],
+	gearShift: [0..5],
+	actualGear: [0..3],
+	transmissionShaftState: [0..1]
+
+constants
+	Nothing = 0,
+	TCUShiftOneUp = 1, TCUShiftOneDown = 2,
+	HandleShiftDrive = 1, HandleShiftPark = 2, HandleShiftReverse = 3,
+	ShiftOneUp = 1, ShiftOneDown = 2, ShiftDrive = 3, ShiftPark = 4, ShiftReverse = 5,
+	First = 0, Second = 1, Park = 2, Reverse = 3,
+	Detached = 0, Attached = 1,
+	FluidDelay = 1, ShiftDelay = 1
+
+axioms
+	Mechanic:
+		(actualGear = First ->
+			gearShift = Nothing | gearShift = ShiftOneUp | gearShift = ShiftPark | gearShift = ShiftReverse
+		) &
+		(actualGear = Second ->
+			gearShift = Nothing | gearShift = ShiftOneDown
+		) &
+		(actualGear = Park ->
+			gearShift = Nothing | gearShift = ShiftDrive | gearShift = ShiftReverse
+		) &
+		(actualGear = Reverse ->
+			gearShift = Nothing | gearShift = ShiftDrive | gearShift = ShiftPark
+		) &
+		(gearShift = ShiftOneUp -> transmissionShaftState = Attached) &
+		(gearShift = ShiftDrive | gearShift = ShiftPark | gearShift = ShiftReverse ->
+			transmissionShaftState = Detached
+		) &
+		(transmissionShaftState = Attached -> actualGear = First | actualGear = Second | actualGear = Reverse);
+		(actualGear = Park -> transmissionShaftState = Detached) &
+	
+	GearShiftCommand:
+		(controlGearShift = TCUShiftOneUp ->
+			Lasts_ii(gearHandle = Nothing, FluidDelay) &
+			Lasts_ei(controlGearShift = Nothing, FluidDelay) &
+			Futr(gearShift = ShiftOneUp, FluidDelay)
+		) &
+		(controlGearShift = TCUShiftOneDown ->
+			Lasts_ii(gearHandle = Nothing, FluidDelay) &
+			Lasts_ei(controlGearShift = Nothing, FluidDelay) &
+			Futr(gearShift = ShiftOneDown, FluidDelay)
+		);
+	
+	GearHandleCommand:
+		(gearHandle = HandleShiftDrive ->
+			Lasts_ii(controlGearShift = Nothing & transmissionShaftState = Detached, FluidDelay) &
+			Lasts_ei(gearHandle = Nothing, FluidDelay) &
+			Futr(gearShift = ShiftDrive, FluidDelay)
+		) &
+		(gearHandle = HandleShiftPark ->
+			Lasts_ii(controlGearShift = Nothing & transmissionShaftState = Detached, FluidDelay) &
+			Lasts_ei(gearHandle = Nothing, FluidDelay) &
+			Futr(gearShift = ShiftPark, FluidDelay)
+		) &
+		(gearHandle = HandleShiftReverse ->
+			Lasts_ii(controlGearShift = Nothing & transmissionShaftState = Detached, FluidDelay) &
+			Lasts_ei(gearHandle = Nothing, FluidDelay) &
+			Futr(gearShift = ShiftReverse, FluidDelay)
+		);
+		
+	GearShiftFirst:
+		(actualGear = First & gearShift = ShiftOneUp ->
+			Lasts_ei(gearShift = Nothing, ShiftDelay) & Futr(actualGear = Second, ShiftDelay)
+		) &
+		(actualGear = First & gearShift = ShiftPark ->
+			Lasts_ii(transmissionShaftState = Detached, ShiftDelay) &
+			Lasts_ei(gearShift = Nothing, ShiftDelay) &
+			Futr(actualGear = Park, ShiftDelay)
+		) &
+		(actualGear = First & gearShift = ShiftReverse ->
+			Lasts_ii(transmissionShaftState = Detached, ShiftDelay) &
+			Lasts_ei(gearShift = Nothing, ShiftDelay) &
+			Futr(actualGear = Reverse, ShiftDelay)
+		);
+
+	GearShiftSecond:
+		(actualGear = Second & gearShift = ShiftOneDown ->
+			Lasts_ei(gearShift = Nothing, ShiftDelay) & Futr(actualGear = First, ShiftDelay)
+		);
+		
+	GearShiftPark:
+		(actualGear = Park & gearShift = ShiftDrive ->
+			Lasts_ii(transmissionShaftState = Detached, ShiftDelay) &
+			Lasts_ei(gearShift = Nothing, ShiftDelay) &
+			Futr(actualGear = First, ShiftDelay)
+		) &
+		(actualGear = Park & gearShift = ShiftReverse ->
+			Lasts_ii(transmissionShaftState = Detached, ShiftDelay) &
+			Lasts_ei(gearShift = Nothing, ShiftDelay) &
+			Futr(actualGear = Reverse, ShiftDelay)
+		);
+		
+	GearShiftReverse:
+		(actualGear = Reverse & gearShift = ShiftDrive ->
+			Lasts_ii(transmissionShaftState = Detached, ShiftDelay) &
+			Lasts_ei(gearShift = Nothing, ShiftDelay) &
+			Futr(actualGear = First, ShiftDelay)
+		) &
+		(actualGear = Reverse & gearShift = ShiftPark ->
+			Lasts_ii(transmissionShaftState = Detached, ShiftDelay) &
+			Lasts_ei(gearShift = Nothing, ShiftDelay) &
+			Futr(actualGear = Park, ShiftDelay)
+		);
