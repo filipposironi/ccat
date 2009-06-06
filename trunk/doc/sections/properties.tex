@@ -1,6 +1,8 @@
 \section{Properties}
 \label{Section:Properties}
-In this Section~\ref{Section:Properties} are reported the three properties we have proved in their decidable TRIO form, these formulae are available in their \emph{Zot} form directly in Listings~\ref{Code:ComputerControlledAutomaticTransmission3}. In order to verify these three properties we needed to translate the from their ``present/future'' form to their ``present/past form'' because of some inherent limitations of \emph{Spin}. The latter property has been verified only with Zot that doesn't need any translation.
+In this Section~\ref{Section:Properties} are reported the three properties we have proved in their decidable TRIO form; these formulae are available in their \emph{Zot} form directly in Listings~\ref{Code:ComputerControlledAutomaticTransmission3}. 
+
+In order to verify these three properties we needed to translate them from their ``present/future'' form to a ``present/past'' form, because of some inherent limitations of \emph{Spin}. The latter property has been verified only with Zot that doesn't need any translation.
 
 \begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 1,label=Code:Property1]
 actualGear = First & controlGearShift = TCUShiftOneUp -> Futr(actualGear = Second, FluidDelay + ShiftDelay);
