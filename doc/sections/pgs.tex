@@ -4,7 +4,7 @@ The \emph{PlanetaryGearSet} class is formalized thanks to the code reported in L
 
 The Planetary Gear Set guarantees that every time a gear shift event occurs the \texttt{actualGear} will be maintained until the shift is finished.
 
-Inside this component are defined all axioms limiting gear shifts to effective ones only (e.g. it is impossibile to shift down a gear if \texttt{actualGear} is \texttt{First}). The Planetary Gear Set permits to shift up to two gear at the same time (as the specification asks), however, the Transmission Control Unit doesn't use this possibility because in a real Planetary Gear Set this is not possibile.
+Inside this component are defined all axioms limiting gear shifts to effective ones only (e.g. it is impossible to shift down a gear if \texttt{actualGear} is \texttt{First}). The Planetary Gear Set permits to shift up to two gear at the same time (as the specification asks), however, the Transmission Control Unit doesn't use this possibility because in a real Planetary Gear Set this is not possible.
 
 Moreover, through the formalization of the Planetary Gear Set we impose that we can't receive a gear shift event if we are in the middle of a gear shift. Different gear shifting times are defined for different gears and different steps.
 

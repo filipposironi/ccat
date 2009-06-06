@@ -4,7 +4,7 @@ The \emph{VehicleSpeedSensor} is formalized thanks to the code reported in Listi
 
 During the formalization of sensors we decided to simplify the design assuming that every time a \texttt{sampleSpeed} event occurs the state variable \texttt{actualSpeed} - which is \texttt{time dependent} and \texttt{total} - is automatically updated with the actual measured speed. This means we don't provide any axioms formalizing this behavior.
 
-Moreover, we specified the starting point of the constant frequency sample chain saying that sometimes in the past there was a \texttt{sampleSpeed} occurrence. Further more, we guarante that \texttt{sampleSpeed} events will accure at constant frequency. In addition, if the sensor has memory we imposed that the \texttt{storedValue} is equal to 0. These can be consider just like the ``initial conditions'' of the system.
+Moreover, we specified the starting point of the constant frequency sample chain saying that sometimes in the past there was a \texttt{sampleSpeed} occurrence. Further more, we guarantee that \texttt{sampleSpeed} events will occur at constant frequency. In addition, if the sensor has memory we imposed that the \texttt{storedValue} is equal to 0. These can be consider just like the ``initial conditions'' of the system.
 
 At the end, we guaranteed a sensor performs the needed action if and only if a sample event occur.
 
