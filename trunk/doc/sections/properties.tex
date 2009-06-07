@@ -1,8 +1,8 @@
 \section{Properties}
 \label{Section:Properties}
-In this Section~\ref{Section:Properties} are reported the three properties we have proved in their decidable TRIO form; these formulae are available in their \emph{Zot} form directly in Listings~\ref{Code:ComputerControlledAutomaticTransmission3}. 
+In this Section~\ref{Section:Properties} are reported the three properties we have proved in their decidable TRIO formulation. 
 
-In order to verify these three properties we needed to translate them from their ``present/future'' form to a ``present/past'' form, because of some inherent limitations of \emph{Spin}. The latter property has been verified only with Zot that doesn't need any translation.
+In order to verify these properties with Spin we needed to translate them from their ``present/future'' formulation to a ``present/past'' formulation because of some inherent limitations of Spin. The latter property has been verified only with Zot that doesn't need any time translation.
 
 \begin{lstlisting}[language=TRIO,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=Property 1,label=Code:Property1]
 actualGear = First & controlGearShift = TCUShiftOneUp -> Futr(actualGear = Second, FluidDelay + ShiftDelay);
@@ -16,5 +16,6 @@ actualGear = First & gearHandle = HandleShiftReverse -> Futr(actualGear = Revers
 actualGear = First & gearHandle = HandleShiftPark -> Futr(actualGear = Park, FluidDelay + ShiftDelay) & Until(transmissionShaftState = Detached, gearHandle <> Nothing));
 \end{lstlisting}
 
-Log files are available at this page \url{http://code.google.com/p/ccat/source/browse/#svn/trunk/log}.
+These three properties are available in their Zot formulation directly in Listings~\ref{Code:ComputerControlledAutomaticTransmission3}.
 
+Log files resulting from our verifications are available at this page \url{http://code.google.com/p/ccat/source/browse/#svn/trunk/log}.

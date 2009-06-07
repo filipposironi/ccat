@@ -1,0 +1,33 @@
+variables
+	gearHandle: [0..2],
+	gearShift: [0..2],
+	actualGear: [0..1]
+
+constants
+	Nothing = 0,
+	HandleShiftDrive = 1, HandleShiftReverse = 2,
+	ShiftDrive = 1, ShiftReverse = 2,
+	First = 0, Reverse = 1,
+	FluidDelay = 1, ShiftDelay = 1
+
+axioms
+	Mechanic:
+		(actualGear = First -> gearShift = Nothing | gearShift = ShiftReverse) &
+		(actualGear = Reverse -> gearShift = Nothing | gearShift = ShiftDrive);
+
+	GearHandleCommand:
+		(gearHandle = HandleShiftDrive -> Lasts_ei(gearHandle = Nothing, FluidDelay) & Futr(gearShift = ShiftDrive, FluidDelay)) &
+		(gearHandle = HandleShiftReverse -> Lasts_ei(gearHandle = Nothing, FluidDelay) & Futr(gearShift = ShiftReverse, FluidDelay));
+	
+	GearShiftFirst:
+		(actualGear = First -> Until(actualGear = First, gearShift <> Nothing)) &
+		(actualGear = First & gearShift = ShiftReverse -> Lasts_ei(gearShift = Nothing, ShiftDelay) & Futr(actualGear = Reverse, ShiftDelay));
+
+	GearShiftReverse:
+		(actualGear = Reverse -> Until(actualGear = Reverse, gearShift <> Nothing)) &
+		(actualGear = Reverse & gearShift = ShiftDrive -> Lasts_ei(gearShift = Nothing, ShiftDelay) & Futr(actualGear = First, ShiftDelay));
+
+	PropertyTwo:
+		Now(SomF(actualGear = First & gearHandle = HandleShiftReverse & not WithinF_ei(actualGear = Reverse, FluidDelay + ShiftDelay)));
+
+

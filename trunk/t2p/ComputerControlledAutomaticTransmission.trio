@@ -65,6 +65,7 @@ axioms
 		);
 		
 	GearShiftFirst:
+		(actualGear = First -> Until(actualGear = First, gearShift <> Nothing)) &
 		(actualGear = First & gearShift = ShiftOneUp ->
 			Lasts_ei(gearShift = Nothing, ShiftDelay) & Futr(actualGear = Second, ShiftDelay)
 		) &
@@ -80,11 +81,13 @@ axioms
 		);
 
 	GearShiftSecond:
+		(actualGear = Second -> Until(actualGear = Second, gearShift <> Nothing)) &
 		(actualGear = Second & gearShift = ShiftOneDown ->
 			Lasts_ei(gearShift = Nothing, ShiftDelay) & Futr(actualGear = First, ShiftDelay)
 		);
 		
 	GearShiftPark:
+		(actualGear = Park -> Until(actualGear = Park, gearShift <> Nothing)) &
 		(actualGear = Park & gearShift = ShiftDrive ->
 			Lasts_ii(transmissionShaftState = Detached, ShiftDelay) &
 			Lasts_ei(gearShift = Nothing, ShiftDelay) &
@@ -97,6 +100,7 @@ axioms
 		);
 		
 	GearShiftReverse:
+		(actualGear = Reverse -> Until(actualGear = Reverse, gearShift <> Nothing)) &
 		(actualGear = Reverse & gearShift = ShiftDrive ->
 			Lasts_ii(transmissionShaftState = Detached, ShiftDelay) &
 			Lasts_ei(gearShift = Nothing, ShiftDelay) &
