@@ -13,12 +13,14 @@ The \emph{ComputerControlledAutomaticTransmission} class is formalized thanks to
 \end{figure}
 
 \newpage
-Due to the fact that a TRIO specification is not decidable we have decided to focus our verification process only on the Hydraulic System, described in Section~\ref{Section:HydraulicSystem}, and on the Planetary Gear Set, described in Section~\ref{Section:PlanetaryGearSet} and we have used a decidable subset of the TRIO language.
+Due to the fact that a complete \emph{TRIO} specification is undecidable we have decided to focus our verification process only on a subset of our system, in particular we have dealt with the Hydraulic System, described in Section~\ref{Section:HydraulicSystem}, and with the Planetary Gear Set, described in Section~\ref{Section:PlanetaryGearSet}.
 
-The specification is reported in Listing~\ref{Code:ComputerControlledAutomaticTransmission2}.
+The \emph{decidable TRIO} specification which further translated in a \emph{ProMeLa} specification thanks to \emph{TRIO2ProMeLa} and then passed to \emph{Spin} is reported in Listing~\ref{Code:ComputerControlledAutomaticTransmission2}.
 
 \lstinputlisting[language=TRIO,tabsize=4,numbers=left,numberstyle=\small,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=ComputerControlledAutomaticTransmission.trio,label=Code:ComputerControlledAutomaticTransmission2]{../t2p/ComputerControlledAutomaticTransmission.trio}
 
-The same specification reported in Listings~\ref{Code:ComputerControlledAutomaticTransmission2} has been ported also in Zot and is listed in Listings~\ref{Code:ComputerControlledAutomaticTransmission3}.
+More details can be found at this web page \url{http://code.google.com/p/ccat/source/browse/#svn/trunk/t2p}.
+
+The same decidable TRIO specification reported in Listings~\ref{Code:ComputerControlledAutomaticTransmission2} has been ported - with few arrangements - in \emph{Zot} and the result is shown in Listings~\ref{Code:ComputerControlledAutomaticTransmission3}.
 
 \lstinputlisting[language=Zot,tabsize=4,numbers=left,numberstyle=\small,basicstyle=\small,breaklines,breakatwhitespace,frame=single,caption=ComputerControlledAutomaticTransmission.lisp,label=Code:ComputerControlledAutomaticTransmission3]{../zot/ComputerControlledAutomaticTransmission.lisp}

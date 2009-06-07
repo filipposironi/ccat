@@ -1,9 +1,8 @@
 warning: for p.o. reduction to be valid the never claim must be stutter-invariant
 (never claims generated from LTL formulae are stutter-invariant)
-depth 0: Claim reached state 5 (line 510)
-depth 0: Claim reached state 5 (line 511)
-depth 385: Claim reached state 9 (line 515)
-depth 383: Claim reached state 9 (line 514)
+depth 0: Claim reached state 5 (line 515)
+depth 0: Claim reached state 5 (line 516)
+depth 402: Claim reached state 9 (line 520)
 (Spin Version 4.3.0 -- 22 June 2007)
 	+ Partial Order Reduction
 	+ Compression
@@ -14,95 +13,69 @@ Full statespace search for:
 	acceptance   cycles 	+ (fairness disabled)
 	invalid end states	- (disabled by never claim)
 
-State-vector 80 byte, depth reached 1934, errors: 0
-    6703 states, stored
-    2082 states, matched
-    8785 transitions (= stored+matched)
-   11065 atomic steps
-hash conflicts: 16 (resolved)
+State-vector 76 byte, depth reached 548, errors: 0
+    6516 states, stored (8955 visited)
+     196 states, matched
+    9151 transitions (= visited+matched)
+    8389 atomic steps
+hash conflicts: 9 (resolved)
 
 Stats on memory usage (in Megabytes):
-0.643 	equivalent memory usage for states (stored*(State-vector + overhead))
-0.458 	actual memory usage for states (compression: 71.24%)
-	State-vector as stored = 52 byte + 16 byte overhead
+0.599 	equivalent memory usage for states (stored*(State-vector + overhead))
+0.561 	actual memory usage for states (compression: 93.53%)
+	State-vector as stored = 70 byte + 16 byte overhead
 2.097 	memory used for hash table (-w19)
 0.320 	memory used for DFS stack (-m10000)
 0.049 	memory lost to fragmentation
-2.827 	total actual memory usage
+2.929 	total actual memory usage
 
 nr of templates: [ globals chans procs ]
-collapse counts: [ 249 8 8 2 2 835 2 2 ]
+collapse counts: [ 125 8 8 8 8 2147 2 2 ]
 unreached in proctype Futr_1
-	line 21, "pan.___", state 14, "msg!1,0,proc"
-	line 26, "pan.___", state 23, "-end-"
+	line 20, "pan.___", state 14, "msg!1,0,proc"
+	line 25, "pan.___", state 23, "-end-"
 	(2 of 23 states)
 unreached in proctype Futr_2
-	line 40, "pan.___", state 14, "msg!1,0,proc"
-	line 45, "pan.___", state 23, "-end-"
+	line 39, "pan.___", state 14, "msg!1,0,proc"
+	line 44, "pan.___", state 23, "-end-"
 	(2 of 23 states)
 unreached in proctype Futr_3
-	line 57, "pan.___", state 7, "i = 0"
-	line 57, "pan.___", state 8, "msg!1,1,proc"
-	line 58, "pan.___", state 10, "i = 0"
-	line 58, "pan.___", state 11, "msg!0,1,proc"
-	line 59, "pan.___", state 14, "msg!1,0,proc"
-	line 56, "pan.___", state 15, "(((i==0)&&(actualGear==1)))"
-	line 56, "pan.___", state 15, "(((i==0)&&!((actualGear==1))))"
-	line 56, "pan.___", state 15, "((i<0))"
-	line 53, "pan.___", state 17, "(!(val1))"
-	line 53, "pan.___", state 17, "(val1)"
-	line 64, "pan.___", state 23, "-end-"
-	(8 of 23 states)
+	line 58, "pan.___", state 14, "msg!1,0,proc"
+	line 63, "pan.___", state 23, "-end-"
+	(2 of 23 states)
 unreached in proctype Futr_4
-	line 76, "pan.___", state 7, "i = 0"
-	line 76, "pan.___", state 8, "msg!1,1,proc"
-	line 77, "pan.___", state 10, "i = 0"
-	line 77, "pan.___", state 11, "msg!0,1,proc"
-	line 78, "pan.___", state 14, "msg!1,0,proc"
-	line 75, "pan.___", state 15, "(((i==0)&&(actualGear==0)))"
-	line 75, "pan.___", state 15, "(((i==0)&&!((actualGear==0))))"
-	line 75, "pan.___", state 15, "((i<0))"
-	line 72, "pan.___", state 17, "(!(val1))"
-	line 72, "pan.___", state 17, "(val1)"
-	line 83, "pan.___", state 23, "-end-"
-	(8 of 23 states)
+	line 77, "pan.___", state 14, "msg!1,0,proc"
+	line 82, "pan.___", state 23, "-end-"
+	(2 of 23 states)
 unreached in proctype spe
-	line 203, "pan.___", state 83, "(1)"
-	line 222, "pan.___", state 111, "(1)"
-	line 287, "pan.___", state 197, "s = 0"
-	line 307, "pan.___", state 224, "s = 0"
-	line 320, "pan.___", state 241, "msg!1,1,proc"
-	line 321, "pan.___", state 242, "msg?value,status,eval(proc)"
-	line 328, "pan.___", state 252, "(1)"
-	line 326, "pan.___", state 253, "(status)"
-	line 326, "pan.___", state 253, "(!(status))"
-	line 358, "pan.___", state 293, "s = 0"
-	line 366, "pan.___", state 302, "msg!1,1,proc"
-	line 367, "pan.___", state 303, "msg?value,status,eval(proc)"
-	line 374, "pan.___", state 313, "(1)"
-	line 372, "pan.___", state 314, "(status)"
-	line 372, "pan.___", state 314, "(!(status))"
-	line 404, "pan.___", state 354, "s = 0"
-	line 436, "pan.___", state 397, "s = 0"
-	line 458, "pan.___", state 420, "i = 0"
-	line 461, "pan.___", state 423, "msg!0,0,proc"
-	line 462, "pan.___", state 424, "i = (i+1)"
-	line 459, "pan.___", state 427, "((i<1))"
-	line 459, "pan.___", state 427, "((i==1))"
-	line 469, "pan.___", state 433, "msg!0,0,proc"
-	line 470, "pan.___", state 434, "i = (i+1)"
-	line 467, "pan.___", state 437, "((i<1))"
-	line 467, "pan.___", state 437, "((i==1))"
-	line 477, "pan.___", state 443, "msg!0,0,proc"
-	line 478, "pan.___", state 444, "i = (i+1)"
-	line 475, "pan.___", state 447, "((i<1))"
-	line 475, "pan.___", state 447, "((i==1))"
-	line 485, "pan.___", state 453, "msg!0,0,proc"
-	line 486, "pan.___", state 454, "i = (i+1)"
-	line 491, "pan.___", state 461, "-end-"
-	(28 of 461 states)
+	line 188, "pan.___", state 79, "(1)"
+	line 207, "pan.___", state 107, "(1)"
+	line 247, "pan.___", state 159, "s = 0"
+	line 262, "pan.___", state 178, "s = 0"
+	line 283, "pan.___", state 206, "(1)"
+	line 333, "pan.___", state 267, "s = 0"
+	line 354, "pan.___", state 295, "(1)"
+	line 404, "pan.___", state 356, "s = 0"
+	line 442, "pan.___", state 404, "s = 0"
+	line 464, "pan.___", state 427, "i = 0"
+	line 467, "pan.___", state 430, "msg!0,0,proc"
+	line 468, "pan.___", state 431, "i = (i+1)"
+	line 465, "pan.___", state 434, "((i<1))"
+	line 465, "pan.___", state 434, "((i==1))"
+	line 475, "pan.___", state 440, "msg!0,0,proc"
+	line 476, "pan.___", state 441, "i = (i+1)"
+	line 473, "pan.___", state 444, "((i<1))"
+	line 473, "pan.___", state 444, "((i==1))"
+	line 483, "pan.___", state 450, "msg!0,0,proc"
+	line 484, "pan.___", state 451, "i = (i+1)"
+	line 481, "pan.___", state 454, "((i<1))"
+	line 481, "pan.___", state 454, "((i==1))"
+	line 491, "pan.___", state 460, "msg!0,0,proc"
+	line 492, "pan.___", state 461, "i = (i+1)"
+	line 497, "pan.___", state 468, "-end-"
+	(22 of 468 states)
 unreached in proctype :init:
 	(0 of 2 states)
 unreached in proctype :never:
-	line 517, "pan.___", state 11, "-end-"
+	line 522, "pan.___", state 11, "-end-"
 	(1 of 11 states)
